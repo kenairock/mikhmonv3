@@ -918,3 +918,4 @@ function mikhmon_rate_clear($bucket)
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/totp.php';
+require_once __DIR__ . '/devicelimit.php';

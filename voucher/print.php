@@ -73,7 +73,7 @@ if (!isset($_SESSION["mikhmon"])) {
 
 
   $getprofile = $API->comm("/ip/hotspot/user/profile/print", array("?name" => "$getuprofile"));
-  $getsharedu = $getprofile[0]['shared-users'];
+  $getsharedu = mikhmon_profile_devices($getprofile[0]['shared-users'], $getprofile[0]['on-login'])['limit'];
   $ponlogin = $getprofile[0]['on-login'];
   $validity = explode(",", $ponlogin)[3];
   $getprice = explode(",", $ponlogin)[2];

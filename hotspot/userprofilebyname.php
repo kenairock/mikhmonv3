@@ -44,6 +44,9 @@ if (!isset($_SESSION["mikhmon"])) {
   $pid = $profiledetalis['.id'];
   $pname = $profiledetalis['name'];
   $psharedu = $profiledetalis['shared-users'];
+  $pdevices = mikhmon_profile_devices($psharedu, $profiledetalis['on-login']);
+  $psharedu = $pdevices['limit'];
+  $pkick = $pdevices['kick'];
   $pratelimit = $profiledetalis['rate-limit'];
   $ponlogin = $profiledetalis['on-login'];
   $ppool = $profiledetalis['address-pool'];
@@ -163,6 +166,9 @@ if (!isset($_SESSION["mikhmon"])) {
     $bgservice = ':local dateint do={:if ([:pick $d 4 5] = "-") do={:return [:tonum ([:pick $d 0 4] . [:pick $d 5 7] . [:pick $d 8 10])]}; :local montharray ( "jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec" );:local days [ :pick $d 4 6 ];:local month [ :pick $d 0 3 ];:local year [ :pick $d 7 11 ];:local monthint ([ :find $montharray $month]);:local month ($monthint + 1);:if ( [len $month] = 1) do={:local zero ("0");:return [:tonum ("$year$zero$month$days")];} else={:return [:tonum ("$year$month$days")];}}; :local timeint do={ :local hours [ :pick $t 0 2 ]; :local minutes [ :pick $t 3 5 ]; :return ($hours * 60 + $minutes) ; }; :local date [ /system clock get date ]; :local time [ /system clock get time ]; :local today [$dateint d=$date] ; :local curtime [$timeint t=$time] ; :foreach i in [ /ip hotspot user find where profile="'.$name.'" ] do={ :local comment [ /ip hotspot user get $i comment]; :local name [ /ip hotspot user get $i name]; :local gettime [:pic $comment 12 20]; :if ([:pic $comment 3] = "/" and [:pic $comment 6] = "/") do={:local expd [$dateint d=$comment] ; :local expt [$timeint t=$gettime] ; :if (($expd < $today and $expt < $curtime) or ($expd < $today and $expt > $curtime) or ($expd = $today and $expt < $curtime)) do={ [ /ip hotspot user '.$mode.' $i ]; [ /ip hotspot active remove [find where user=$name] ];}}}';
     
 
+    // "When full": RouterOS refuses the extra device; the kick option lets it in and drops the oldest instead
+    list($sharedusers, $onlogin) = mikhmon_profile_apply_devices($sharedusers, mikhmon_input($_POST, 'whenfull') === 'kick', $onlogin);
+
     $API->comm("/ip/hotspot/user/profile/set", array(
 			  		  /*"add-mac-cookie" => "yes",*/
       ".id" => "$pid",
@@ -236,7 +242,15 @@ if (!isset($_SESSION["mikhmon"])) {
     </td>
   </tr>
   <tr>
-    <td>Shared Users</td><td><input class="form-control" type="text" size="4" autocomplete="off" name="sharedusers" value="<?= $psharedu; ?>" required="1"></td>
+    <td>Shared Users</td><td><input class="form-control" type="text" size="4" autocomplete="off" name="sharedusers" value="<?= esc($psharedu); ?>" required="1"></td>
+  </tr>
+  <tr>
+    <td class="align-middle">When all devices are in use</td><td>
+      <select class="form-control" name="whenfull">
+        <option value="refuse"<?= $pkick ? '' : ' selected' ?>>Refuse the new device (RouterOS default)</option>
+        <option value="kick"<?= $pkick ? ' selected' : '' ?>>Disconnect the oldest device</option>
+      </select>
+    </td>
   </tr>
   <tr>
     <td>Rate limit [up/down]</td><td><input class="form-control" type="text" name="ratelimit" autocomplete="off" value="<?= $pratelimit; ?>" placeholder="Example : 512k/1M" ></td>

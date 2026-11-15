@@ -98,7 +98,8 @@ for ($i = 0; $i < $TotalReg; $i++) {
 	echo "<a title='Open User by profile " . $pname . "'  href='./?hotspot=users&profile=" . $pname . "&session=" . $session . "'><i class='fa fa-users'></i></a></td>";
 	echo "<td><a title='Open User Profile " . $pname . "' href='./?user-profile=" . $pid . "&session=" . $session . "'><i class='fa fa-edit'></i> <i class='fa fa-ci fa-circle ".$moncolor."'></i> $pname</a></td>";
 //$profiledetalis = $ARRAY[$i];echo "<td>" . $profiledetalis['name'];echo "</td>";
-	echo "<td>" . esc($psharedu);
+	$pdevices = mikhmon_profile_devices($psharedu, $ponlogin);
+	echo "<td>" . esc($pdevices['limit']) . ($pdevices['kick'] ? " <i class='fa fa-random text-orange' title='Disconnects the oldest device when a new one logs in'></i>" : '');
 	echo "</td>";
 	echo "<td>" . esc($pratelimit);
 	echo "</td>";
