@@ -75,8 +75,9 @@ if (!isset($_SESSION["mikhmon"])) {
 
                     $(document).ready(function() {
                         Highcharts.setOptions({
-                          global: {
-                            useUTC: false
+                          time: {
+                            // Highcharts 12: show the browser's local time (replaces global.useUTC: false)
+                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
                           },
                           chart: {
                             height: 500,
@@ -116,7 +117,9 @@ if (!isset($_SESSION["mikhmon"])) {
                         xAxis: {
                           type: 'datetime',
                           tickPixelInterval: 150,
-                          maxZoom: 20 * 1000,
+                          minRange: 20 * 1000,
+                          // keep the 24-hour axis labels of Highcharts 8 (v12 defaults to the browser locale)
+                          dateTimeLabelFormats: { second: '%H:%M:%S', minute: '%H:%M', hour: '%H:%M' },
                         },
                         yAxis: {
                             minPadding: 0.2,
