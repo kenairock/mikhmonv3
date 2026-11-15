@@ -20,44 +20,26 @@ session_start();
 
 ?>
 
-<div style="padding-top: 5%;"  class="login-box">
+<div class="login-box">
   <div class="card">
-    <div class="card-header">
-      <h3><?= $_please_login ?></h3>
-    </div>
-    <div class="card-body">
-      <div class="text-center pd-5">
-        <img src="img/favicon.png" alt="MIKHMON Logo">
+    <div class="card-body login-card">
+      <div class="login-logo">
+        <span class="mark"><i class="fa fa-wifi"></i></span>
+        <span class="login-title">MIKHMON</span>
+        <span class="muted"><?= esc($_please_login) ?></span>
       </div>
-      <div  class="text-center">
-      <span style="font-size: 25px; margin: 10px;">MIKHMON</span>
-      </div>
-      <center>
+      <?= $error; ?>
       <form autocomplete="off" action="" method="post"><?= csrf_field() ?>
-      <table class="table" style="width:90%">
-        <tr>
-          <td class="align-middle text-center">
-            <input style="width: 100%; height: 35px; font-size: 16px;" class="form-control" type="text" name="user" id="_username" placeholder="Username" required="1" autofocus>
-          </td>
-        </tr>
-        <tr>
-          <td class="align-middle text-center">
-            <input style="width: 100%; height: 35px; font-size: 16px;" class="form-control" type="password" name="pass" placeholder="Password" required="1">
-          </td>
-        </tr>
-        <tr>
-          <td class="align-middle text-center">
-            <input style="width: 100%; margin-top:20px; height: 35px; font-weight: bold; font-size: 17px;" class="btn-login bg-primary pointer" type="submit" name="login" value="Login">
-          </td>
-        </tr>
-        <tr>
-          <td class="align-middle text-center">
-            <?= $error; ?>
-          </td>
-        </tr>
-      </table>
+        <div class="field">
+          <label for="_username">Username</label>
+          <input class="form-control" type="text" name="user" id="_username" placeholder="Username" required="1" autofocus autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="_password">Password</label>
+          <input class="form-control" type="password" name="pass" id="_password" placeholder="Password" required="1" autocomplete="current-password">
+        </div>
+        <input class="btn-login bg-primary pointer" type="submit" name="login" value="Login">
       </form>
-      </center>
     </div>
   </div>
 </div>

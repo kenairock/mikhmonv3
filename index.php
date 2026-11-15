@@ -508,9 +508,9 @@ elseif ($ppp == "edit-profile") {
 </div>
 <?php if ($report != "resume-report") { // report/resumereport.php already loaded Highcharts (loading it twice = Highcharts error #16) ?>
 <script src="./js/highcharts/highcharts.js"></script>
-<script src="./js/highcharts/themes/hc.<?= $theme; ?>.js"></script>
+<script src="./js/highcharts/themes/hc.mikhmon.js"></script>
 <?php } ?>
-<script src="./js/mikhmon-ui.<?= $theme; ?>.min.js"></script>
+<script src="./js/mikhmon-shell.js"></script>
 <script src="./js/mikhmon.js?t=<?= str_replace(" ","_",date("Y-m-d H:i:s")); ?>"></script>
 
 <?php

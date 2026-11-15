@@ -52,7 +52,7 @@ if ($currency == in_array($currency, $cekindo['indo'])) {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en"<?= mikhmon_theme_html_attrs($theme) ?>>
 <head>
 <title><?= esc($title[0] . " " . $hotspotname); ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -63,7 +63,8 @@ if ($currency == in_array($currency, $cekindo['indo'])) {
 <link rel="stylesheet" href="../css/fontawesome/css/all.min.css">
 <link rel="stylesheet" href="../css/fontawesome/css/v4-shims.min.css">
 <!-- Mikhmon UI -->
-<link rel="stylesheet" href="../css/mikhmon-ui.<?= $theme; ?>.min.css">
+<?= mikhmon_theme_head_script() ?>
+<link rel="stylesheet" href="../css/mikhmon.css?v=<?= (int)@filemtime(__DIR__ . '/../css/mikhmon.css') ?>">
 <link rel="icon" href="../img/favicon.png" />
 <script>
 function goBack() {

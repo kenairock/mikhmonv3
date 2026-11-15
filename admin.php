@@ -81,7 +81,7 @@ if ($id == "login" || substr($url, -1) == "p") {
     $auth = ($wait > 0) ? null : mikhmon_authenticate($user, $pass, $useradm, $passadm);
     if ($wait > 0) {
       mikhmon_log_login($user, false, 'rate limited');
-      $error = '<div style="width: 100%; padding:5px 0px 5px 0px; border-radius:5px;" class="bg-danger"><i class="fa fa-ban"></i> Alert!<br>Too many failed logins. Try again in ' . ceil($wait / 60) . ' minute(s).</div>';
+      $error = '<div class="alert bg-danger" role="alert"><i class="fa fa-ban"></i> Too many failed logins. Try again in ' . ceil($wait / 60) . ' minute(s).</div>';
     } elseif ($auth['ok']) {
       mikhmon_rate_clear('login');
       mikhmon_start_user_session($auth['user']);
@@ -98,7 +98,7 @@ if ($id == "login" || substr($url, -1) == "p") {
       mikhmon_rate_hit('login');
       mikhmon_log_login($user, false, $auth['reason']);
       usleep(random_int(300000, 700000));
-      $error = '<div style="width: 100%; padding:5px 0px 5px 0px; border-radius:5px;" class="bg-danger"><i class="fa fa-ban"></i> Alert!<br>'
+      $error = '<div class="alert bg-danger" role="alert"><i class="fa fa-ban"></i> '
         . ($auth['reason'] === 'database unavailable' ? 'Account database unavailable. Check that pdo_sqlite is enabled.' : 'Invalid username or password.') . '</div>';
     }
   }
@@ -204,7 +204,7 @@ if ($id == "login" || substr($url, -1) == "p") {
 	echo "<script>window.location='./admin.php?id=sessions'</script>";
 }
 ?>
-<script src="js/mikhmon-ui.<?= $theme; ?>.min.js"></script>
+<script src="js/mikhmon-shell.js"></script>
 <script src="js/mikhmon.js?t=<?= str_replace(" ","_",date("Y-m-d H:i:s")); ?>"></script>
 <?php include('./include/info.php'); ?>
 </body>

@@ -18,9 +18,11 @@
 session_start();
  // hide all error
 error_reporting(0);
+
+$defmode = mikhmon_theme_defaults($theme)[0];
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="<?= esc(isset($langid) ? $langid : 'en') ?>"<?= mikhmon_theme_html_attrs($theme) ?>>
 	<head>
 		<title>MIKHMON <?= esc($hotspotname); ?></title>
 		<meta charset="utf-8">
@@ -28,20 +30,21 @@ error_reporting(0);
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<!-- Tell the browser to be responsive to screen width -->
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<!-- Theme color -->
-		<meta name="theme-color" content="<?= $themecolor ?>" />
+		<!-- Theme color (updated by js/mikhmon-shell.js) -->
+		<meta name="theme-color" content="<?= $defmode === 'dark' ? '#1b2128' : '#ffffff' ?>" />
+		<!-- Apply the saved mode/accent before first paint (no flash). Preference is per browser. -->
+		<?= mikhmon_theme_head_script() ?>
 		<!-- Font Awesome -->
 		<!-- Font Awesome Free 7.3.1 (+ v4 shims for the few old icon names) -->
 		<link rel="stylesheet" href="css/fontawesome/css/all.min.css">
 		<link rel="stylesheet" href="css/fontawesome/css/v4-shims.min.css">
 		<!-- Mikhmon UI -->
-		<link rel="stylesheet" href="css/mikhmon-ui.<?= $theme; ?>.min.css">
+		<link rel="stylesheet" href="css/mikhmon.css?v=<?= (int)@filemtime(__DIR__ . '/../css/mikhmon.css') ?>">
 		<!-- favicon -->
 		<link rel="icon" href="./img/favicon.png" />
 		<!-- jQuery -->
 		<script src="js/jquery.min.js"></script>
-		<!-- pace -->
-		<link href="css/pace.<?= $theme; ?>.css" rel="stylesheet" />
+		<!-- pace (progress bar; styled in css/mikhmon.css) -->
 		<script src="js/pace.min.js"></script>
 
 		

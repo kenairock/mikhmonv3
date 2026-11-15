@@ -45,12 +45,12 @@ $isdefault = $me && strtolower($me['username']) === 'mikhmon' && mikhmon_passwor
   </div>
   <div class="card-body">
   <?php if (!$me) { ?>
-    <div class="bg-danger" style="padding:8px; border-radius:5px;"><i class="fa fa-warning"></i>
+    <div class="alert bg-danger" role="alert" style="margin-bottom:10px;"><i class="fa fa-warning"></i>
       Account database not available (enable pdo_sqlite). The legacy admin login can be changed under Admin Settings.</div>
   <?php } else { ?>
-    <?php if ($isdefault) { ?><div class="bg-danger" style="padding:8px; border-radius:5px; margin-bottom:10px;"><i class="fa fa-warning"></i> You are using the default password 1234.</div><?php } ?>
-    <?php if ($ownmsg !== '') { ?><div class="bg-success" style="padding:8px; border-radius:5px; margin-bottom:10px;"><i class="fa fa-check"></i> <?= esc($ownmsg) ?></div><?php } ?>
-    <?php if ($ownerr !== '') { ?><div class="bg-danger" style="padding:8px; border-radius:5px; margin-bottom:10px;"><i class="fa fa-ban"></i> <?= esc($ownerr) ?></div><?php } ?>
+    <?php if ($isdefault) { ?><div class="alert bg-danger" role="alert" style="margin-bottom:10px;"><i class="fa fa-warning"></i> You are using the default password 1234.</div><?php } ?>
+    <?php if ($ownmsg !== '') { ?><div class="alert bg-success" role="alert" style="margin-bottom:10px;"><i class="fa fa-check"></i> <?= esc($ownmsg) ?></div><?php } ?>
+    <?php if ($ownerr !== '') { ?><div class="alert bg-danger" role="alert" style="margin-bottom:10px;"><i class="fa fa-ban"></i> <?= esc($ownerr) ?></div><?php } ?>
     <table class="table table-sm">
       <tr><td>Username</td><td><b><?= esc($me['username']) ?></b></td></tr>
       <tr><td>Role</td><td><?= esc(ucfirst($me['role'])) ?></td></tr>

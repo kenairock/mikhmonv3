@@ -128,7 +128,7 @@ if (!isset($_SESSION["mikhmon"])) {
               <div class="card-header">
                 <h3 class="card-title"><i class="fa fa-user-circle"></i> <?= $_admin ?> &nbsp; <small><?= esc($_SESSION['mikhmon']) ?> (<?= esc(mikhmon_current_role()) ?>)</small></h3>
                 <?php if ($acctdefault) { ?>
-                <div class="bg-danger" style="padding:5px; border-radius:5px; margin-top:5px;"><i class="fa fa-warning"></i> Default login mikhmon / 1234 is in use. Change it before exposing Mikhmon to other users.</div>
+                <div class="alert bg-danger" role="alert" style="margin-bottom:10px;"><i class="fa fa-warning"></i> Default login mikhmon / 1234 is in use. Change it before exposing Mikhmon to other users.</div>
                 <?php } ?>
               </div>
             <div class="card-body">

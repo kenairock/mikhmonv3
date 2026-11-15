@@ -39,7 +39,7 @@ $fmt = function ($ts) {
   </div>
   <div class="card-body">
   <?php if (mikhmon_db() === null) { ?>
-    <div class="bg-danger" style="padding:8px; border-radius:5px;"><i class="fa fa-warning"></i> Database not available (enable pdo_sqlite); nothing is being recorded.</div>
+    <div class="alert bg-danger" role="alert" style="margin-bottom:10px;"><i class="fa fa-warning"></i> Database not available (enable pdo_sqlite); nothing is being recorded.</div>
   <?php } else { ?>
     <form method="get" action="./admin.php" style="margin-bottom:10px;">
       <input type="hidden" name="id" value="audit">
@@ -62,13 +62,13 @@ $fmt = function ($ts) {
     </form>
 
     <div style="overflow-x:auto;">
-    <table class="table table-bordered table-hover text-nowrap">
+    <table class="table table-bordered table-hover" style="table-layout:auto;">
     <?php if ($logtab === 'login') { ?>
       <thead><tr><th>Time</th><th>User</th><th>Result</th><th>Reason</th><th>IP</th><th>Browser</th></tr></thead>
       <tbody>
       <?php foreach ($logrows as $r) { ?>
         <tr>
-          <td><?= esc($fmt($r['ts'])) ?></td>
+          <td style="white-space:nowrap;"><?= esc($fmt($r['ts'])) ?></td>
           <td><?= esc($r['username']) ?></td>
           <td><?= (int) $r['success'] === 1 ? '<span class="text-green">success</span>' : '<span class="text-red">failed</span>' ?></td>
           <td><?= esc($r['reason']) ?></td>
@@ -82,13 +82,13 @@ $fmt = function ($ts) {
       <tbody>
       <?php foreach ($logrows as $r) { ?>
         <tr>
-          <td><?= esc($fmt($r['ts'])) ?></td>
+          <td style="white-space:nowrap;"><?= esc($fmt($r['ts'])) ?></td>
           <td><?= esc($r['username']) ?></td>
           <td><?= esc($r['role']) ?></td>
           <td><?= esc($r['router']) ?></td>
-          <td><?= esc($r['action']) ?></td>
-          <td><?= esc($r['target']) ?></td>
-          <td style="white-space:normal; min-width:200px;"><?= esc($r['details']) ?></td>
+          <td style="min-width:170px; overflow-wrap:anywhere;"><?= esc($r['action']) ?></td>
+          <td style="word-break:break-word;"><?= esc($r['target']) ?></td>
+          <td style="white-space:normal; min-width:200px; max-width:360px; word-break:break-word;"><?= esc($r['details']) ?></td>
           <td><?= $r['result'] === 'ok' ? '<span class="text-green">ok</span>' : '<span class="text-red">' . esc($r['result']) . '</span>' ?></td>
           <td><?= esc($r['ip']) ?></td>
         </tr>

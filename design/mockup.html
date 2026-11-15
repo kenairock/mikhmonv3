@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto" data-accent="blue">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIKHMON – design mockup</title>
+<!-- Existing icon font (already bundled with Mikhmon). No other dependencies. -->
+<!-- Font Awesome Free 7.3.1 (+ v4 shims for the few old icon names) -->
+<link rel="stylesheet" href="../css/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="../css/fontawesome/css/v4-shims.min.css">
+<style>
+/* =====================================================================
+   MIKHMON reskin mockup – plain CSS, no frameworks
+   Layers: tokens -> base -> layout -> components
+   ===================================================================== */
+@layer tokens, base, layout, components;
+
+@layer tokens {
+  :root {
+    color-scheme: light dark;               /* "auto" follows the OS */
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+    /* neutral surfaces: light-dark(light, dark) */
+    --bg:        light-dark(#f3f5f8, #12161b);
+    --surface:   light-dark(#ffffff, #1b2128);
+    --surface-2: light-dark(#f7f9fb, #222a33);
+    --border:    light-dark(#dfe4ea, #2d3641);
+    --text:      light-dark(#1a2230, #e8edf3);
+    --muted:     light-dark(#566274, #9aa7b6);
+    --shadow:    light-dark(0 1px 2px rgb(16 24 40 / .06), 0 1px 2px rgb(0 0 0 / .4));
+    --shadow-lg: light-dark(0 12px 32px rgb(16 24 40 / .16), 0 12px 32px rgb(0 0 0 / .55));
+
+    /* status colours (always shown with a text label) */
+    --ok:      light-dark(#1b7a43, #5fd08a);   --ok-bg:   light-dark(#e3f4ea, #17321f);
+    --warn:    light-dark(#8a5a00, #f0b84a);   --warn-bg: light-dark(#fdf1d8, #3a2d0f);
+    --bad:     light-dark(#b42318, #ff8a80);   --bad-bg:  light-dark(#fde7e5, #3d1a18);
+    --idle:    light-dark(#4b5667, #a9b4c2);   --idle-bg: light-dark(#e9edf2, #2a323c);
+    --series-2: light-dark(#d4452f, #ff8f7a);
+
+    --radius: 10px;
+    --radius-sm: 7px;
+    --space: 4px;
+    --topbar-h: 56px;
+    --sidebar-w: 248px;
+  }
+  :root[data-theme="light"] { color-scheme: light; }
+  :root[data-theme="dark"]  { color-scheme: dark; }
+
+  /* accent: one colour per accent, picked for contrast in each mode */
+  :root, :root[data-accent="blue"] {
+    --accent:       light-dark(#00689d, #5cbff0);
+    --accent-soft:  light-dark(#e1f1fa, #14303f);
+    --on-accent:    light-dark(#ffffff, #07141c);
+  }
+  :root[data-accent="green"] {
+    --accent:       light-dark(#1b7a43, #5fd08a);
+    --accent-soft:  light-dark(#e3f4ea, #17321f);
+    --on-accent:    light-dark(#ffffff, #07170e);
+  }
+  :root[data-accent="pink"] {
+    --accent:       light-dark(#b5174f, #f58ab1);
+    --accent-soft:  light-dark(#fbe4ed, #3b1927);
+    --on-accent:    light-dark(#ffffff, #1c0a12);
+  }
+  :root[data-accent="slate"] {
+    --accent:       light-dark(#364457, #b7c4d6);
+    --accent-soft:  light-dark(#e6eaf0, #29323d);
+    --on-accent:    light-dark(#ffffff, #0f141a);
+  }
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 400 14px/1.5 var(--font);
+  }
+  h1, h2, h3 { margin: 0; line-height: 1.25; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button, input, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .num, td.num { font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+}
+
+@layer layout {
+  .app { display: none; min-height: 100vh; }
+  body[data-view="dashboard"] .app, body[data-view="users"] .app, body[data-view="add"] .app { display: block; }
+
+  /* ---- top bar ---- */
+  .topbar {
+    position: sticky; top: 0; z-index: 30; height: var(--topbar-h);
+    display: flex; align-items: center; gap: 12px; padding: 0 16px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  #brand { font-weight: 800; letter-spacing: .08em; font-size: 16px; color: var(--text); display: inline-flex; align-items: center; gap: 8px; }
+  #brand::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
+  .topbar .spacer { flex: 1; }
+  .menu-btn { display: none; }
+
+  /* ---- sidebar ---- */
+  .sidebar {
+    position: fixed; top: var(--topbar-h); bottom: 0; left: 0; width: var(--sidebar-w); z-index: 20;
+    background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 12px 10px 24px;
+    transition: transform .2s ease;
+  }
+  .router-card { padding: 10px 12px; margin-bottom: 8px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); }
+  .router-card b { display: block; }
+  .nav-label { margin: 14px 12px 4px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .nav a {
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm);
+    color: var(--text); text-decoration: none;
+  }
+  .nav a .fa { width: 18px; text-align: center; color: var(--muted); }
+  .nav a:hover { background: var(--surface-2); }
+  .nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .nav a[aria-current="page"] .fa { color: var(--accent); }
+  .scrim { display: none; position: fixed; inset: var(--topbar-h) 0 0 0; background: rgb(0 0 0 / .45); z-index: 15; }
+
+  /* ---- content ---- */
+  .content { margin-left: var(--sidebar-w); padding: 24px clamp(16px, 3vw, 32px) 48px; max-width: 1480px; }
+  .page-head { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 16px; margin-bottom: 20px; }
+  .page-head h1 { font-size: 24px; }
+  .crumbs { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .page-head .grow { flex: 1; }
+  .grid { display: grid; gap: 16px; }
+  .grid.stats { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 16px; }
+  .grid.two { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .view { display: none; }
+  body[data-view="dashboard"] #v-dashboard, body[data-view="users"] #v-users, body[data-view="add"] #v-add { display: block; }
+
+  @media (max-width: 1023px) {
+    .menu-btn { display: inline-flex; }
+    .sidebar { transform: translateX(-100%); }
+    body.nav-open .sidebar { transform: none; box-shadow: var(--shadow-lg); }
+    body.nav-open .scrim { display: block; }
+    .content { margin-left: 0; }
+    .grid.two { grid-template-columns: 1fr; }
+    .hide-md { display: none !important; }
+  }
+  @media (max-width: 639px) {
+    .content { padding-top: 16px; }
+    .page-head h1 { font-size: 20px; }
+    .hide-sm { display: none !important; }
+  }
+}
+
+@layer components {
+  /* ---- cards ---- */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .card-header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .card-header h2 { font-size: 15px; font-weight: 650; white-space: nowrap; }
+  .card-header .fa { color: var(--accent); }
+  .card-body { padding: 16px; }
+
+  /* ---- buttons ---- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 0 14px;
+    border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-weight: 550;
+    transition: background .12s, border-color .12s;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn.danger { background: var(--bad); border-color: var(--bad); color: light-dark(#fff, #1d0705); }
+  .btn.ghost { border-color: transparent; background: transparent; }
+  .btn.ghost:hover { background: var(--surface-2); }
+  .btn.icon { width: 38px; padding: 0; }
+  .btn.sm { min-height: 30px; padding: 0 10px; font-size: 13px; }
+  .btn.sm.icon { width: 30px; }
+
+  /* ---- forms ---- */
+  .field { display: grid; align-content: start; gap: 6px; margin-bottom: 16px; }
+  .field label { font-weight: 600; font-size: 13px; }
+  .field .hint { font-size: 12px; color: var(--muted); }
+  .input, select.input {
+    width: 100%; min-height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text);
+  }
+  .input:hover { border-color: light-dark(#b8c1cc, #46515f); }
+  .input:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+  .input-group { display: flex; }
+  .input-group .input { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+  .input-group .addon {
+    display: inline-flex; align-items: center; padding: 0 12px; border: 1px solid var(--border); border-left: 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--surface-2); color: var(--muted);
+  }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 20px; }
+  .search { position: relative; }
+  .search .fa { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .search .input { padding-left: 34px; min-width: 220px; }
+
+  /* ---- stat tiles ---- */
+  .stat { padding: 16px; display: grid; gap: 4px; }
+  .stat .label { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .stat .label .ico { width: 28px; height: 28px; display: inline-grid; place-items: center; border-radius: 8px; background: var(--accent-soft); color: var(--accent); }
+  .stat .value { font-size: 28px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .stat .sub { font-size: 12px; color: var(--muted); }
+  .stat .sub b { color: var(--ok); font-weight: 600; }
+
+  /* ---- badges ---- */
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .badge.ok   { color: var(--ok);   background: var(--ok-bg); }
+  .badge.warn { color: var(--warn); background: var(--warn-bg); }
+  .badge.bad  { color: var(--bad);  background: var(--bad-bg); }
+  .badge.idle { color: var(--idle); background: var(--idle-bg); }
+  .badge.role { color: var(--accent); background: var(--accent-soft); }
+  .badge.role::before { display: none; }
+
+  /* ---- tables ---- */
+  .table-wrap { overflow: auto; max-height: 560px; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; white-space: nowrap; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  thead th {
+    position: sticky; top: 0; z-index: 1; background: var(--surface-2); font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+  }
+  tbody tr:hover td { background: var(--surface-2); }
+  td.num, th.num { text-align: right; }
+  td .code { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .toolbar .grow { flex: 1; }
+  .table-foot { display: flex; justify-content: space-between; gap: 10px; padding: 12px 16px; color: var(--muted); font-size: 13px; }
+  .empty { display: none; padding: 40px 16px; text-align: center; color: var(--muted); }
+  .empty .fa { font-size: 28px; margin-bottom: 8px; }
+
+  /* ---- chart ---- */
+  .chart { width: 100%; height: auto; display: block; }
+  .chart .grid-line { stroke: var(--border); stroke-width: 1; }
+  .chart text { fill: var(--muted); font-size: 11px; font-family: var(--font); }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-left: auto; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  /* ---- segmented control / dots ---- */
+  .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; }
+  .seg button { border: 0; background: transparent; padding: 4px 9px; border-radius: 6px; cursor: pointer; color: var(--muted); }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+  .dots { display: inline-flex; gap: 6px; }
+  .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--border); cursor: pointer; padding: 0; }
+  .dot[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--text); }
+  .timer { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .user-chip { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* ---- login ---- */
+  .login { display: none; min-height: 100vh; place-items: center; padding: 24px; background:
+    radial-gradient(900px 400px at 50% -10%, var(--accent-soft), transparent 70%), var(--bg); }
+  body[data-view="login"] .login { display: grid; }
+  .login .card { width: min(400px, 100%); padding: 28px; }
+  .login .logo { display: grid; place-items: center; gap: 10px; margin-bottom: 20px; text-align: center; }
+  .login .logo .mark { width: 52px; height: 52px; border-radius: 14px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 24px; }
+  .login h1 { font-size: 20px; }
+  .alert { display: flex; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 16px; }
+  .alert.bad  { background: var(--bad-bg);  color: var(--bad); }
+  .alert.warn { background: var(--warn-bg); color: var(--warn); }
+
+  /* ---- dialog & toast ---- */
+  dialog { border: 1px solid var(--border); border-radius: 14px; padding: 0; background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg); width: min(420px, calc(100vw - 32px)); }
+  dialog::backdrop { background: rgb(0 0 0 / .5); }
+  dialog .d-body { padding: 20px; }
+  dialog .d-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px 20px; }
+  .toasts { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 60; }
+  .toast { background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 10px; box-shadow: var(--shadow-lg); display: flex; gap: 10px; align-items: center; animation: pop .18s ease; }
+  @keyframes pop { from { transform: translateY(8px); opacity: 0; } }
+}
+</style>
+</head>
+<body data-view="login">
+
+<!-- ============================ LOGIN ============================ -->
+<main class="login">
+  <div class="card">
+    <div class="logo">
+      <div class="mark"><i class="fa fa-wifi"></i></div>
+      <div><span style="font-weight:800;letter-spacing:.08em;font-size:18px">MIKHMON</span><div class="muted">Sign in to manage your hotspot</div></div>
+    </div>
+    <div class="alert bad" role="alert"><i class="fa fa-ban"></i><span>Invalid username or password.</span></div>
+    <form onsubmit="event.preventDefault(); go('dashboard'); toast('Signed in as mikhmon');">
+      <div class="field"><label for="u">Username</label><input class="input" id="u" value="mikhmon" autocomplete="username"></div>
+      <div class="field"><label for="p">Password</label><input class="input" id="p" type="password" value="1234" autocomplete="current-password"></div>
+      <button class="btn primary" style="width:100%;min-height:42px" type="submit">Sign in</button>
+    </form>
+    <p class="muted" style="margin:16px 0 0;font-size:12px;text-align:center">5 failed attempts lock the sign-in for 15 minutes.</p>
+  </div>
+</main>
+
+<!-- ============================== APP ============================== -->
+<div class="app">
+  <header class="topbar">
+    <button class="btn ghost icon menu-btn" id="menu" aria-label="Open menu"><i class="fa fa-bars"></i></button>
+    <a id="brand" href="#dashboard">MIKHMON</a>
+    <span class="spacer"></span>
+    <span class="timer hide-sm" title="Idle timeout"><i class="fa fa-clock-o"></i><span id="timer">10:00</span></span>
+    <span class="dots hide-md" role="group" aria-label="Accent colour">
+      <button class="dot" data-accent="blue"  style="background:#0f7ab8" aria-pressed="true"  aria-label="Blue"></button>
+      <button class="dot" data-accent="green" style="background:#2f9a5b" aria-pressed="false" aria-label="Green"></button>
+      <button class="dot" data-accent="pink"  style="background:#d63a76" aria-pressed="false" aria-label="Pink"></button>
+      <button class="dot" data-accent="slate" style="background:#556579" aria-pressed="false" aria-label="Slate"></button>
+    </span>
+    <span class="seg" role="group" aria-label="Colour mode">
+      <button data-theme="light" aria-pressed="false" aria-label="Light"><i class="fa fa-sun-o"></i></button>
+      <button data-theme="auto"  aria-pressed="true"  aria-label="Auto (follow system)"><i class="fa fa-adjust"></i></button>
+      <button data-theme="dark"  aria-pressed="false" aria-label="Dark"><i class="fa fa-moon-o"></i></button>
+    </span>
+    <span class="user-chip hide-sm"><i class="fa fa-user-circle fa-lg muted"></i><span>mikhmon</span><span class="badge role">Admin</span></span>
+    <button class="btn ghost icon" aria-label="Sign out" onclick="go('login')"><i class="fa fa-sign-out"></i></button>
+  </header>
+
+  <nav class="sidebar nav" aria-label="Main">
+    <div class="router-card"><span class="muted" style="font-size:12px">Router</span><b>Lab Hotspot</b><span class="badge ok" style="margin-top:6px">Connected</span></div>
+    <a href="#dashboard" data-nav="dashboard"><i class="fa fa-dashboard"></i> Dashboard</a>
+    <div class="nav-label">Hotspot</div>
+    <a href="#users" data-nav="users"><i class="fa fa-users"></i> Users</a>
+    <a href="#add" data-nav="add"><i class="fa fa-user-plus"></i> Add / generate</a>
+    <a href="#x"><i class="fa fa-pie-chart"></i> User profiles</a>
+    <a href="#x"><i class="fa fa-wifi"></i> Active <span class="badge idle" style="margin-left:auto">42</span></a>
+    <a href="#x"><i class="fa fa-laptop"></i> Hosts</a>
+    <a href="#x"><i class="fa fa-address-book"></i> IP bindings</a>
+    <div class="nav-label">Vouchers</div>
+    <a href="#x"><i class="fa fa-print"></i> Quick print</a>
+    <a href="#x"><i class="fa fa-ticket"></i> Vouchers</a>
+    <div class="nav-label">Reports</div>
+    <a href="#x"><i class="fa fa-money"></i> Sales report</a>
+    <a href="#x"><i class="fa fa-align-justify"></i> Logs</a>
+    <a href="#x"><i class="fa fa-area-chart"></i> Traffic monitor</a>
+    <div class="nav-label">System</div>
+    <a href="#x"><i class="fa fa-clock-o"></i> Scheduler</a>
+    <a href="#x"><i class="fa fa-sitemap"></i> DHCP leases</a>
+    <a href="#x"><i class="fa fa-gear"></i> Settings</a>
+    <a href="#x"><i class="fa fa-users"></i> Accounts</a>
+    <a href="#x"><i class="fa fa-history"></i> Login &amp; audit history</a>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="content">
+    <!-- ---------------------- DASHBOARD ---------------------- -->
+    <section class="view" id="v-dashboard">
+      <div class="page-head">
+        <div class="grow"><div class="crumbs">Lab Hotspot</div><h1>Dashboard</h1></div>
+        <button class="btn"><i class="fa fa-refresh"></i> Refresh</button>
+        <a class="btn primary" href="#add"><i class="fa fa-user-plus"></i> Generate vouchers</a>
+      </div>
+
+      <div class="grid stats">
+        <div class="card stat"><div class="label"><span class="ico"><i class="fa fa-wifi"></i></span> Active users</div><div class="value">42</div><div class="sub"><b>▲ 6</b> since an hour ago</div></div>
+        <div class="card stat"><div class="label"><span class="ico"><i class="fa fa-users"></i></span> Total users</div><div class="value">1,284</div><div class="sub">312 unused vouchers</div></div>
+        <div class="card stat"><div class="label"><span class="ico"><i class="fa fa-money"></i></span> Today's income</div><div class="value">Rp 385,000</div><div class="sub"><b>▲ 12%</b> vs yesterday · 77 vouchers</div></div>
+        <div class="card stat"><div class="label"><span class="ico"><i class="fa fa-microchip"></i></span> Router load</div><div class="value">12%</div><div class="sub">Uptime 14d 03h · RouterOS 7.16</div></div>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="card-header"><i class="fa fa-area-chart"></i><h2>Traffic · ether1</h2>
+            <span class="legend"><span><i style="background:var(--accent)"></i>Tx 2.4 Mbps</span><span><i style="background:var(--series-2)"></i>Rx 6.1 Mbps</span></span></div>
+          <div class="card-body">
+            <svg class="chart" viewBox="0 0 640 220" role="img" aria-label="Traffic over the last minutes">
+              <defs>
+                <linearGradient id="gA" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".30"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient>
+                <linearGradient id="gB" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--series-2)" stop-opacity=".25"/><stop offset="1" stop-color="var(--series-2)" stop-opacity="0"/></linearGradient>
+              </defs>
+              <g class="grid-line"><line x1="44" x2="632" y1="20" y2="20"/><line x1="44" x2="632" y1="70" y2="70"/><line x1="44" x2="632" y1="120" y2="120"/><line x1="44" x2="632" y1="170" y2="170"/></g>
+              <text x="38" y="24" text-anchor="end">8 Mbps</text><text x="38" y="74" text-anchor="end">6</text><text x="38" y="124" text-anchor="end">4</text><text x="38" y="174" text-anchor="end">2</text>
+              <text x="44" y="204">12:30:00</text><text x="240" y="204">12:30:20</text><text x="436" y="204">12:30:40</text><text x="600" y="204" text-anchor="end">12:31:00</text>
+              <path d="M44 150 C90 140 120 110 160 118 S240 150 290 120 S380 90 430 105 S520 140 560 126 S610 100 632 108 L632 190 L44 190Z" fill="url(#gB)"/>
+              <path d="M44 150 C90 140 120 110 160 118 S240 150 290 120 S380 90 430 105 S520 140 560 126 S610 100 632 108" fill="none" stroke="var(--series-2)" stroke-width="2.2"/>
+              <path d="M44 172 C90 168 130 160 170 164 S250 176 300 160 S390 150 440 158 S520 170 570 160 S612 154 632 156 L632 190 L44 190Z" fill="url(#gA)"/>
+              <path d="M44 172 C90 168 130 160 170 164 S250 176 300 160 S390 150 440 158 S520 170 570 160 S612 154 632 156" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><i class="fa fa-align-justify"></i><h2>Hotspot log</h2><a href="#x" style="margin-left:auto;font-size:13px">View all</a></div>
+          <div class="card-body" style="display:grid;gap:12px;font-size:13px">
+            <div><span class="num muted">12:30:41</span> &nbsp;<b>up-482-7K</b> logged in <span class="muted">· 10.5.50.23</span></div>
+            <div><span class="num muted">12:29:18</span> &nbsp;<b>vc-3391</b> logged out <span class="muted">· session ended</span></div>
+            <div><span class="num muted">12:27:02</span> &nbsp;<b>up-118-9Q</b> <span class="badge bad">expired</span></div>
+            <div><span class="num muted">12:25:44</span> &nbsp;<b>up-904-2D</b> logged in <span class="muted">· 10.5.50.71</span></div>
+            <div><span class="num muted">12:22:10</span> &nbsp;<b>vc-7710</b> logged in <span class="muted">· 10.5.50.12</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------ USERS ------------------------ -->
+    <section class="view" id="v-users">
+      <div class="page-head">
+        <div class="grow"><div class="crumbs">Lab Hotspot › Hotspot</div><h1>Users</h1></div>
+        <a class="btn primary" href="#add"><i class="fa fa-user-plus"></i> Add user</a>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <div class="search"><i class="fa fa-search"></i><input class="input" id="q" type="search" placeholder="Filter users…" aria-label="Filter users"></div>
+          <select class="input" style="width:auto" aria-label="Profile"><option>All profiles</option><option>1-Hour</option><option>1-Day</option><option>1-Week</option></select>
+          <select class="input hide-sm" style="width:auto" aria-label="Status"><option>All statuses</option><option>Active</option><option>Unused</option><option>Expired</option></select>
+          <span class="grow"></span>
+          <button class="btn"><i class="fa fa-download"></i> Export</button>
+          <button class="btn danger" onclick="askDelete('selected users')"><i class="fa fa-trash"></i> Delete expired</button>
+        </div>
+        <div class="table-wrap">
+          <table id="tbl">
+            <thead><tr>
+              <th style="width:36px"><input type="checkbox" aria-label="Select all"></th>
+              <th>User</th><th>Profile</th><th class="hide-md">MAC address</th><th class="num hide-sm">Uptime</th><th class="num hide-sm">Data used</th><th>Status</th><th class="hide-md">Comment</th><th></th>
+            </tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">up-482-7K</span></td><td>1-Hour</td><td class="hide-md"><span class="code" style="font-weight:500">4C:5E:0C:A1:20:9F</span></td><td class="num hide-sm">00:42:10</td><td class="num hide-sm">182.4 MiB</td><td><span class="badge ok">Active</span></td><td class="hide-md muted">up-11.15.26</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('up-482-7K')"><i class="fa fa-trash"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">vc-3391</span></td><td>1-Day</td><td class="hide-md"><span class="code" style="font-weight:500">B8:27:EB:3D:77:10</td><td class="num hide-sm">03:05:44</td><td class="num hide-sm">1.2 GiB</td><td><span class="badge ok">Active</span></td><td class="hide-md muted">vc-11.14.26</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('vc-3391')"><i class="fa fa-trash"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">up-118-9Q</span></td><td>1-Hour</td><td class="hide-md"><span class="code" style="font-weight:500">F0:18:98:6C:11:42</td><td class="num hide-sm">01:00:00</td><td class="num hide-sm">512.0 MiB</td><td><span class="badge bad">Expired</span></td><td class="hide-md muted">up-11.15.26</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('up-118-9Q')"><i class="fa fa-trash"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">up-904-2D</span></td><td>1-Week</td><td class="hide-md"><span class="code" style="font-weight:500">A4:83:E7:09:5B:CC</td><td class="num hide-sm">1d 02:11:09</td><td class="num hide-sm">6.8 GiB</td><td><span class="badge warn">Expires in 2 days</span></td><td class="hide-md muted">up-11.09.26</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('up-904-2D')"><i class="fa fa-trash"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">vc-7710</span></td><td>1-Day</td><td class="hide-md"><span class="code" style="font-weight:500">—</span></td><td class="num hide-sm">00:00:00</td><td class="num hide-sm">0 B</td><td><span class="badge idle">Unused</span></td><td class="hide-md muted">vc-11.15.26</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('vc-7710')"><i class="fa fa-trash"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">vc-5521</span></td><td>1-Hour</td><td class="hide-md"><span class="code" style="font-weight:500">—</span></td><td class="num hide-sm">00:00:00</td><td class="num hide-sm">0 B</td><td><span class="badge idle">Unused</span></td><td class="hide-md muted">vc-11.15.26</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('vc-5521')"><i class="fa fa-trash"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">up-660-1M</span></td><td>1-Day</td><td class="hide-md"><span class="code" style="font-weight:500">D8:3A:DD:4F:92:07</span></td><td class="num hide-sm">00:00:00</td><td class="num hide-sm">0 B</td><td><span class="badge bad">Disabled</span></td><td class="hide-md muted">blocked by admin</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('up-660-1M')"><i class="fa fa-trash"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" aria-label="Select"></td><td><span class="code">up-205-8X</span></td><td>1-Week</td><td class="hide-md"><span class="code" style="font-weight:500">3C:22:FB:80:14:6A</td><td class="num hide-sm">4d 11:20:31</td><td class="num hide-sm">14.3 GiB</td><td><span class="badge ok">Active</span></td><td class="hide-md muted">up-11.09.26</td><td><div class="row-actions"><button class="btn sm icon ghost" aria-label="Edit"><i class="fa fa-edit"></i></button><button class="btn sm icon ghost" aria-label="Print voucher"><i class="fa fa-print"></i></button><button class="btn sm icon ghost" aria-label="Delete" onclick="askDelete('up-205-8X')"><i class="fa fa-trash"></i></button></div></td></tr>
+            </tbody>
+          </table>
+          <div class="empty" id="empty"><div><i class="fa fa-search"></i></div>No users match your filter.</div>
+        </div>
+        <div class="table-foot"><span id="count">8 users</span><span>Page 1 of 161</span></div>
+      </div>
+    </section>
+
+    <!-- ------------------------- ADD ------------------------- -->
+    <section class="view" id="v-add">
+      <div class="page-head">
+        <div class="grow"><div class="crumbs">Lab Hotspot › Hotspot › Users</div><h1>Generate vouchers</h1></div>
+      </div>
+      <form class="card" onsubmit="event.preventDefault(); toast('50 vouchers generated'); go('users');">
+        <div class="card-header"><i class="fa fa-ticket"></i><h2>Voucher batch</h2></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field"><label for="qty">Quantity</label><input class="input" id="qty" type="number" min="1" max="500" value="50"><span class="hint">Between 1 and 500 per batch.</span></div>
+            <div class="field"><label for="prof">Profile</label><select class="input" id="prof"><option>1-Hour</option><option selected>1-Day</option><option>1-Week</option></select></div>
+            <div class="field"><label for="mode">User mode</label><select class="input" id="mode"><option>Username = password</option><option>Username + password</option></select></div>
+            <div class="field"><label for="len">Code length</label><select class="input" id="len"><option>4</option><option selected>6</option><option>8</option></select></div>
+            <div class="field"><label for="pre">Prefix</label><input class="input" id="pre" value="vc-" maxlength="6"></div>
+            <div class="field"><label for="tl">Time limit</label><div class="input-group"><input class="input" id="tl" type="number" value="1"><span class="addon">hours</span></div></div>
+            <div class="field"><label for="dl">Data limit</label><div class="input-group"><input class="input" id="dl" type="number" placeholder="Unlimited"><span class="addon">GiB</span></div></div>
+            <div class="field"><label for="cm">Comment</label><input class="input" id="cm" placeholder="e.g. weekend promo"><span class="hint">Letters and numbers only.</span></div>
+          </div>
+          <div class="alert warn"><i class="fa fa-info-circle"></i><span>The batch is saved on the router and opened in the print view afterwards.</span></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+            <a class="btn" href="#users">Cancel</a>
+            <button class="btn primary" type="submit"><i class="fa fa-check"></i> Generate</button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>
+
+<!-- confirm dialog (native <dialog>) and toasts -->
+<dialog id="dlg" aria-labelledby="dt">
+  <form method="dialog">
+    <div class="d-body">
+      <h2 id="dt" style="font-size:17px;margin-bottom:8px">Delete <span id="dname"></span>?</h2>
+      <p class="muted" style="margin:0">This removes it from the router. It can't be undone.</p>
+    </div>
+    <div class="d-foot"><button class="btn" value="cancel">Cancel</button><button class="btn danger" value="ok"><i class="fa fa-trash"></i> Delete</button></div>
+  </form>
+</dialog>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+  var root = document.documentElement, body = document.body;
+  var params = new URLSearchParams(location.search);
+
+  function setTheme(t) { root.setAttribute('data-theme', t); mark('[data-theme]', 'data-theme', t); }
+  function setAccent(a) { root.setAttribute('data-accent', a); mark('[data-accent].dot', 'data-accent', a); }
+  function mark(sel, attr, val) {
+    document.querySelectorAll(sel).forEach(function (b) { if (b.tagName === 'BUTTON') b.setAttribute('aria-pressed', b.getAttribute(attr) === val); });
+  }
+  document.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { setTheme(b.dataset.theme); }; });
+  document.querySelectorAll('.dot').forEach(function (b) { b.onclick = function () { setAccent(b.dataset.accent); }; });
+
+  // views (hash routing)
+  window.go = function (v) { location.hash = v; };
+  function route() {
+    var v = (location.hash || '#login').slice(1);
+    if (!/^(login|dashboard|users|add)$/.test(v)) v = 'dashboard';
+    body.setAttribute('data-view', v);
+    document.querySelectorAll('[data-nav]').forEach(function (a) {
+      if (a.dataset.nav === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    body.classList.remove('nav-open');
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+
+  // mobile drawer
+  document.getElementById('menu').onclick = function () { body.classList.toggle('nav-open'); };
+  document.getElementById('scrim').onclick = function () { body.classList.remove('nav-open'); };
+
+  // quick filter (vanilla)
+  var q = document.getElementById('q');
+  q.addEventListener('input', function () {
+    var term = q.value.toLowerCase(), shown = 0;
+    document.querySelectorAll('#tbl tbody tr').forEach(function (tr) {
+      var hit = tr.textContent.toLowerCase().indexOf(term) !== -1;
+      tr.style.display = hit ? '' : 'none'; if (hit) shown++;
+    });
+    document.getElementById('empty').style.display = shown ? 'none' : 'block';
+    document.getElementById('count').textContent = shown + (shown === 1 ? ' user' : ' users');
+  });
+
+  // dialog + toast
+  var dlg = document.getElementById('dlg');
+  window.askDelete = function (name) { document.getElementById('dname').textContent = name; dlg.showModal(); };
+  // the submit event carries the pressed button (e.submitter); it fires synchronously with the click
+  dlg.querySelector('form').addEventListener('submit', function (e) {
+    if (e.submitter && e.submitter.value === 'ok') toast('Deleted ' + document.getElementById('dname').textContent);
+  });
+  window.toast = function (msg) {
+    var t = document.createElement('div'); t.className = 'toast'; t.innerHTML = '<i class="fa fa-check"></i>';
+    t.appendChild(document.createTextNode(msg)); document.getElementById('toasts').appendChild(t);
+    setTimeout(function () { t.remove(); }, 3200);
+  };
+
+  // idle-timer look (static demo)
+  var secs = 600, el = document.getElementById('timer');
+  setInterval(function () { secs = secs > 0 ? secs - 1 : 600; el.textContent = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0'); }, 1000);
+
+  // allow ?theme=dark&accent=green&view=users for screenshots / sharing
+  if (params.get('theme')) setTheme(params.get('theme'));
+  if (params.get('accent')) setAccent(params.get('accent'));
+  if (params.get('view')) history.replaceState(null, '', '#' + params.get('view'));   // no hashchange event
+  route();
+  if (params.get('nav')) body.classList.add('nav-open');
+})();
+</script>
+</body>
+</html>

@@ -76,6 +76,59 @@ function mikhmon_input($source, $key, $default = '')
 }
 
 // ---------------------------------------------------------------------------
+// Theme (look and feel)
+// ---------------------------------------------------------------------------
+
+/**
+ * Default look for visitors who have not picked one in the Appearance menu.
+ * The old server-side theme names map onto a mode and an accent (css/mikhmon.css).
+ * Returns array(mode, accent).
+ */
+function mikhmon_theme_defaults($theme)
+{
+    $map = array(
+        'dark'  => array('dark', 'blue'),
+        'light' => array('light', 'blue'),
+        'blue'  => array('light', 'blue'),
+        'green' => array('light', 'green'),
+        'pink'  => array('light', 'pink'),
+    );
+    return isset($map[$theme]) ? $map[$theme] : array('auto', 'blue');
+}
+
+/** Attributes for the <html> tag (no-JavaScript fallback; the script below refines them). */
+function mikhmon_theme_html_attrs($theme)
+{
+    list($mode, $accent) = mikhmon_theme_defaults($theme);
+    return ' data-mode="' . esc($mode) . '" data-theme="' . ($mode === 'dark' ? 'dark' : 'light') . '" data-accent="' . esc($accent) . '"';
+}
+
+/**
+ * Inline script for <head>: applies the browser's saved mode/accent (localStorage) before
+ * first paint, so there is no flash. js/mikhmon-shell.js wires up the Appearance controls.
+ */
+function mikhmon_theme_head_script()
+{
+    return "<script>
+(function () {
+"
+        . "  var d = document.documentElement, m, a;
+"
+        . "  try { m = localStorage.getItem('mikhmon.mode'); a = localStorage.getItem('mikhmon.accent'); } catch (e) {}
+"
+        . "  m = (m === 'auto' || m === 'light' || m === 'dark') ? m : d.getAttribute('data-mode');
+"
+        . "  a = (a === 'blue' || a === 'green' || a === 'pink' || a === 'slate') ? a : d.getAttribute('data-accent');
+"
+        . "  var dark = m === 'dark' || (m === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+"
+        . "  d.setAttribute('data-mode', m); d.setAttribute('data-theme', dark ? 'dark' : 'light'); d.setAttribute('data-accent', a);
+"
+        . "})();
+</script>";
+}
+
+// ---------------------------------------------------------------------------
 // Session (router) names
 // ---------------------------------------------------------------------------
 

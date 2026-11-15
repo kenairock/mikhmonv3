@@ -84,7 +84,7 @@ if ($currency == in_array($currency, $cekindo['indo'])) {
                 <div class="row">
 
                   <script src="./js/highcharts/highcharts.js"></script>
-                  <script src="./js/highcharts/themes/hc.<?= $theme; ?>.js"></script>
+                  <script src="./js/highcharts/themes/hc.mikhmon.js"></script>
 
 
 <div class="col-12" id="container"></div>

@@ -88,11 +88,11 @@ $fmt = function ($ts) {
   </div>
   <div class="card-body">
   <?php if (!$dbok) { ?>
-    <div class="bg-danger" style="padding:8px; border-radius:5px;"><i class="fa fa-warning"></i>
+    <div class="alert bg-danger" role="alert" style="margin-bottom:10px;"><i class="fa fa-warning"></i>
       The account database is not available. Enable the <b>pdo_sqlite</b> PHP extension; until then only the single login from config.php works.</div>
   <?php } else { ?>
-    <?php if ($acctmsg !== '') { ?><div class="bg-success" style="padding:8px; border-radius:5px; margin-bottom:10px;"><i class="fa fa-check"></i> <?= esc($acctmsg) ?></div><?php } ?>
-    <?php if ($accterr !== '') { ?><div class="bg-danger" style="padding:8px; border-radius:5px; margin-bottom:10px;"><i class="fa fa-ban"></i> <?= esc($accterr) ?></div><?php } ?>
+    <?php if ($acctmsg !== '') { ?><div class="alert bg-success" role="alert" style="margin-bottom:10px;"><i class="fa fa-check"></i> <?= esc($acctmsg) ?></div><?php } ?>
+    <?php if ($accterr !== '') { ?><div class="alert bg-danger" role="alert" style="margin-bottom:10px;"><i class="fa fa-ban"></i> <?= esc($accterr) ?></div><?php } ?>
 
     <div style="overflow-x:auto;">
     <table class="table table-bordered table-hover text-nowrap">

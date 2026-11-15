@@ -113,126 +113,76 @@ if (!isset($_SESSION["mikhmon"])) {
     
 <div id="reloadHome">
 
-    <div id="r_1" class="row">
-      <div class="col-4">
-        <div class="box bmh-75 box-bordered">
-          <div class="box-group">
-            <div class="box-group-icon"><i class="fa fa-calendar"></i></div>
-              <div class="box-group-area">
-                <span ><?= $_system_date_time ?><br>
-                    <?php 
-                    echo ucfirst($clock['date']) . " " . $clock['time'] . "<br>
-                    ".$_uptime." : " . formatDTM($resource['uptime']);
-                    $_SESSION[$session.'sdate'] = $clock['date'];
-                    ?>
-                </span>
-              </div>
-            </div>
+  <div id="r_1">
+    <div class="dash-info">
+      <div class="box">
+        <div class="box-group">
+          <div class="box-group-icon"><i class="fa fa-calendar"></i></div>
+          <div class="box-group-area">
+            <span><?= $_system_date_time ?><br>
+              <?php
+              echo esc(ucfirst($clock['date']) . " " . $clock['time']) . "<br>" . $_uptime . " : " . esc(formatDTM($resource['uptime']));
+              $_SESSION[$session.'sdate'] = $clock['date'];
+              ?>
+            </span>
           </div>
         </div>
-      <div class="col-4">
-        <div class="box bmh-75 box-bordered">
-          <div class="box-group">
+      </div>
+      <div class="box">
+        <div class="box-group">
           <div class="box-group-icon"><i class="fa fa-info-circle"></i></div>
-              <div class="box-group-area">
-                <span >
-                    <?php
-                    echo $_board_name." : " . $resource['board-name'] . "<br/>
-                    ".$_model." : " . $routerboard['model'] . "<br/>
-                    Router OS : " . $resource['version'];
-                    ?>
-                </span>
-              </div>
-            </div>
+          <div class="box-group-area">
+            <span>
+              <?php
+              echo $_board_name . " : " . esc($resource['board-name']) . "<br/>" . $_model . " : " . esc($routerboard['model']) . "<br/>Router OS : " . esc($resource['version']);
+              ?>
+            </span>
           </div>
         </div>
-    <div class="col-4">
-      <div class="box bmh-75 box-bordered">
+      </div>
+      <div class="box">
         <div class="box-group">
           <div class="box-group-icon"><i class="fa fa-server"></i></div>
-              <div class="box-group-area">
-                <span >
-                    <?php
-                    echo $_cpu_load." : " . $resource['cpu-load'] . "%<br/>
-                    ".$_free_memory." : " . formatBytes($resource['free-memory'], 2) . "<br/>
-                    ".$_free_hdd." : " . formatBytes($resource['free-hdd-space'], 2)
-                    ?>
-                </span>
-                </div>
-              </div>
-            </div>
-          </div> 
+          <div class="box-group-area">
+            <span>
+              <?php
+              echo $_cpu_load . " : " . esc($resource['cpu-load']) . "%<br/>" . $_free_memory . " : " . formatBytes($resource['free-memory'], 2) . "<br/>" . $_free_hdd . " : " . formatBytes($resource['free-hdd-space'], 2);
+              ?>
+            </span>
+          </div>
+        </div>
       </div>
+    </div>
+  </div>
 
-        <div class="row">
-          <div  class="col-8">
-            <div id="r_2"class="row">
-            <div class="card">
-              <div class="card-header"><h3><i class="fa fa-wifi"></i> Hotspot</h3></div>
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-3 col-box-6">
-                      <div class="box bg-blue bmh-75">
-                        <a onclick="cancelPage()" href="./?hotspot=active&session=<?= $session; ?>">
-                          <h1><?= $counthotspotactive; ?>
-                              <span style="font-size: 15px;"><?= $hunit; ?></span>
-                            </h1>
-                          <div>
-                            <i class="fa fa-laptop"></i> <?= $_hotspot_active ?>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-                    <div class="col-3 col-box-6">
-                    <div class="box bg-green bmh-75">
-                      <a onclick="cancelPage()" href="./?hotspot=users&profile=all&session=<?= $session; ?>">
-                            <h1><?= $countallusers; ?>
-                              <span style="font-size: 15px;"><?= $uunit; ?></span>
-                            </h1>
-                      <div>
-                            <i class="fa fa-users"></i> <?= $_hotspot_users ?>
-                          </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div class="col-3 col-box-6">
-                    <div class="box bg-yellow bmh-75">
-                      <a onclick="cancelPage()" href="./?hotspot-user=add&session=<?= $session; ?>">
-                        <div>
-                          <h1><i class="fa fa-user-plus"></i>
-                              <span style="font-size: 15px;"><?= $_add ?></span>
-                          </h1>
-                        </div>
-                        <div>
-                            <i class="fa fa-user-plus"></i> <?= $_hotspot_users ?>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div class="col-3 col-box-6">
-                    <div class="box bg-red bmh-75">
-                      <a onclick="cancelPage()" href="./?hotspot-user=generate&session=<?= $session; ?>">
-                        <div>
-                          <h1><i class="fa fa-user-plus"></i>
-                              <span style="font-size: 15px;"><?= $_generate ?></span>
-                          </h1>
-                        </div>
-                        <div>
-                            <i class="fa fa-user-plus"></i> <?= $_hotspot_users ?>
-                        </div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-            <div class="card">
-              <div class="card-header"><h3><i class="fa fa-area-chart"></i> <?= $_traffic ?> </h3></div>
+  <div id="r_2">
+    <div class="dash-tiles">
+      <a class="tile" onclick="cancelPage()" href="./?hotspot=active&session=<?= $session; ?>">
+        <span class="tile-label"><span class="ico"><i class="fa fa-wifi"></i></span> <?= $_hotspot_active ?></span>
+        <span class="tile-value"><?= $counthotspotactive; ?> <small><?= $hunit; ?></small></span>
+      </a>
+      <a class="tile" onclick="cancelPage()" href="./?hotspot=users&profile=all&session=<?= $session; ?>">
+        <span class="tile-label"><span class="ico"><i class="fa fa-users"></i></span> <?= $_hotspot_users ?></span>
+        <span class="tile-value"><?= $countallusers; ?> <small><?= $uunit; ?></small></span>
+      </a>
+      <?php if (mikhmon_can('operator')) { ?>
+      <a class="tile tile-action" onclick="cancelPage()" href="./?hotspot-user=add&session=<?= $session; ?>">
+        <span class="tile-label"><span class="ico"><i class="fa fa-user-plus"></i></span> <?= $_hotspot_users ?></span>
+        <span class="tile-value"><?= $_add ?></span>
+      </a>
+      <a class="tile tile-action" onclick="cancelPage()" href="./?hotspot-user=generate&session=<?= $session; ?>">
+        <span class="tile-label"><span class="ico"><i class="fa fa-ticket"></i></span> <?= $_hotspot_users ?></span>
+        <span class="tile-value"><?= $_generate ?></span>
+      </a>
+      <?php } ?>
+    </div>
+  </div>
 
-              <div class="card-body">
-  
-                  <?php $getinterface = $API->comm("/interface/print");
+  <div class="dash-main">
+    <div class="card">
+      <div class="card-header"><h3><i class="fa fa-area-chart"></i> <?= $_traffic ?></h3></div>
+      <div class="card-body">
+        <?php $getinterface = $API->comm("/interface/print");
                   $interface = $getinterface[$iface - 1]['name']; 
                   /*$TotalReg = count($getinterface);
                   for ($i = 0; $i < $TotalReg; $i++) {
@@ -349,12 +299,11 @@ if (!isset($_SESSION["mikhmon"])) {
                     });
                   </script>
                   <div id="trafficMonitor"></div>
-                </div> 
-              </div>
-            </div>  
-            <div class="col-4">
-            <div id="r_4" class="row">
-              <div <?= $lreport; ?> class="box bmh-75 box-bordered">
+      </div>
+    </div>
+    <div class="dash-side">
+      <div id="r_4">
+        <div <?= $lreport; ?> class="box">
                 <div class="box-group">
                   <div class="box-group-icon"><i class="fa fa-money"></i></div>
                     <div class="box-group-area">
@@ -374,33 +323,34 @@ if (!isset($_SESSION["mikhmon"])) {
                 </div>
               </div>
             </div>
-            </div>
-            <div id="r_3" class="row">
-            <div class="card">
-              <div class="card-header">
-                <h3><a onclick="cancelPage()" href="./?hotspot=log&session=<?= $session; ?>" title="Open Hotspot Log" ><i class="fa fa-align-justify"></i> <?= $_hotspot_log ?></a></h3></div>
-                  <div class="card-body">
-                    <div style="padding: 5px; height: <?= $logh; ?> ;" class="mr-t-10 overflow">
-                      <table class="table table-sm table-bordered table-hover" style="font-size: 12px; td.padding:2px;">
-                        <thead>
-                          <tr>
-                            <th><?= $_time ?></th>
-                            <th><?= $_users ?> (IP)</th>
-                            <th><?= $_messages ?></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td colspan="3" class="text-center">
-                            <div id="loader" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></div>
-                            </td>
-                          </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              </div>
-            </div>
-</div>
+      </div>
+      <div id="r_3">
+        <div class="card">
+        <div class="card-header">
+          <h3><a onclick="cancelPage()" href="./?hotspot=log&session=<?= $session; ?>" title="Open Hotspot Log"><i class="fa fa-align-justify"></i> <?= $_hotspot_log ?></a></h3>
+        </div>
+        <div class="card-body">
+          <div style="max-height: <?= $logh; ?>;" class="overflow">
+            <table class="table table-sm table-bordered table-hover" style="font-size: 12px;">
+              <thead>
+                <tr>
+                  <th><?= $_time ?></th>
+                  <th><?= $_users ?> (IP)</th>
+                  <th><?= $_messages ?></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="3" class="text-center">
+                    <div id="loader"><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
 </div>
