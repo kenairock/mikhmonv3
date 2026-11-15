@@ -176,14 +176,15 @@ table.voucher {
     $datalimit = formatBytes($getdatalimit, 2);
   }
   
-  $urilogin = "http://$dnsname/login?username=$username&password=$password";
+  $urilogin = "http://$dnsname/login?username=" . rawurlencode($username) . "&password=" . rawurlencode($password);
+  $qrid = 'qr' . $i;
   $qrcode = "
-	<canvas class='qrcode' id='".$uid."'></canvas>
+	<canvas class='qrcode' id='".$qrid."'></canvas>
     <script>
       (function() {
-        var ".$uid." = new QRious({
-          element: document.getElementById('".$uid."'),
-          value: '".$urilogin."',
+        new QRious({
+          element: document.getElementById('".$qrid."'),
+          value: ".esc_js($urilogin).",
           size:'256'
         });
 

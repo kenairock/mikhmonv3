@@ -225,9 +225,9 @@ $getquickprint = $API->comm("/system/script/print", array("?name" => "$quickprin
           $_SESSION['sss'] = $uname;
          
 // Print BT
-  $chl = urlencode("http://$dnsname/login?username=$uname&password=$upass");
-	$qrcode = 'https://chart.googleapis.com/chart?cht=qr&chs=100x100&chld=L|0&chl=' . $chl . '&choe=utf-8';
-	//$qrcode = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='.$chl;
+  // QR picture made by this server (include/qrcode.php); the phone app fetches it through a signed, short-lived link
+  include_once(__DIR__ . '/../include/qrcode.php');
+  $qrcode = mikhmon_qr_url("http://$dnsname/login?username=" . rawurlencode($uname) . "&password=" . rawurlencode($upass));
 
 if ($currency == in_array($currency, $cekindo['indo'])) {
   $pricebt = $currency . " " . number_format($price, 0, ",", ".");

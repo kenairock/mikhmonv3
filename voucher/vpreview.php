@@ -76,14 +76,14 @@ if ($currency == in_array($currency, $cekindo['indo'])) {
     $datalimit = formatBytes($getdatalimit, 2);
   }
   
-  $urilogin = "http://$dnsname/login?username=$username&password=$password";
+  $urilogin = "http://$dnsname/login?username=" . rawurlencode($username) . "&password=" . rawurlencode($password);
   $qrcode = "
 	<canvas class='qrcode' id='qr'></canvas>
     <script>
       (function() {
         var qr = new QRious({
           element: document.getElementById('qr'),
-          value: '".$urilogin."',
+          value: ".esc_js($urilogin).",
           size:'256'
         });
 
