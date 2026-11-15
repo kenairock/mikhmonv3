@@ -1,0 +1,6 @@
+# Runtime secrets / state created by Mikhmon - never commit
+include/secret.key.php
+include/.ratelimit.json
+include/mikhmon.sqlite
+include/mikhmon.sqlite-wal
+include/mikhmon.sqlite-shm
