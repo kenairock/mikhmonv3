@@ -134,7 +134,7 @@ if ($id == "login" || substr($url, -1) == "p") {
     };
     </script>';
 } elseif ($id == "connect"  && !empty($session)) {
-  ini_set("max_execution_time",5);  
+  ini_set("max_execution_time",15);  // connect() may wait up to ~7 s when the router does not answer
   include_once('./include/menu.php');
   $API = new RouterosAPI();
   $API->debug = false;
@@ -144,10 +144,13 @@ if ($id == "login" || substr($url, -1) == "p") {
   } else {
     $_SESSION["connect"] = "<b class='text-red'>Not Connected</b>";
     $nl = '\n';
+    // why it failed, safe inside a JavaScript string
+    $whyfail = ($API->fail === 'login' ? 'Login refused (check user/password). ' : '') . $API->fail_text;
+    $whyfail = substr(json_encode($whyfail, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE), 1, -1);
     if ($currency == in_array($currency, $cekindo['indo'])) {
-      echo "<script>alert('Mikhmon not connected!".$nl."Silakan periksa kembali IP, User, Password dan port API harus enable.".$nl."Jika menggunakan koneksi VPN, pastikan VPN tersebut terkoneksi.')</script>";
+      echo "<script>alert('Mikhmon not connected!".$nl."Silakan periksa kembali IP, User, Password dan port API harus enable.".$nl."Jika menggunakan koneksi VPN, pastikan VPN tersebut terkoneksi.".$nl.$nl.$whyfail."')</script>";
     }else{
-      echo "<script>alert('Mikhmon not connected!".$nl."Please check the IP, User, Password and port API must be enabled.')</script>";
+      echo "<script>alert('Mikhmon not connected!".$nl."Please check the IP, User, Password and port API must be enabled.".$nl.$nl.$whyfail."')</script>";
     }
     if($c == "settings"){
       echo "<script>window.location='./admin.php?id=settings&session=" . $session . "'</script>";

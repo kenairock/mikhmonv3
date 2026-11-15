@@ -23,8 +23,10 @@ class RouterosAPI
     var $port      = 8728;  //  Port to connect to (default 8729 for ssl)
     var $ssl       = false; //  Connect using SSL (must enable api-ssl in IP/Services)
     var $timeout   = 3;     //  Connection attempt timeout and data read timeout
-    var $attempts  = 5;     //  Connection attempt count
-    var $delay     = 3;     //  Delay between connection attempts in seconds
+    var $attempts  = 2;     //  Connection attempt count (was 5)
+    var $delay     = 1;     //  Delay between connection attempts in seconds (was 3)
+    var $fail      = '';    //  After a failed connect(): 'unreachable' or 'login'
+    var $fail_text = '';    //  Human readable detail of the failure
 
     var $socket;            //  Variable for storing socket resource
     var $error_no;          //  Variable for storing connection error number, if any
@@ -95,6 +97,8 @@ class RouterosAPI
      */
     public function connect($ip, $login, $password)
     {
+        $this->fail = '';
+        $this->fail_text = '';
         for ($ATTEMPT = 1; $ATTEMPT <= $this->attempts; $ATTEMPT++) {
             $this->connected = false;
             $PROTOCOL = ($this->ssl ? 'ssl://' : '' );
@@ -102,7 +106,7 @@ class RouterosAPI
             $this->debug('Connection attempt #' . $ATTEMPT . ' to ' . $PROTOCOL . $ip . ':' . $this->port . '...');
             $this->socket = @stream_socket_client($PROTOCOL . $ip.':'. $this->port, $this->error_no, $this->error_str, $this->timeout, STREAM_CLIENT_CONNECT,$context);
             if ($this->socket) {
-                socket_set_timeout($this->socket, $this->timeout);
+                stream_set_timeout($this->socket, $this->timeout);
                 $this->write('/login', false);
                 $this->write('=name=' . $login, false);
                 $this->write('=password=' . $password);
@@ -132,11 +136,30 @@ class RouterosAPI
                     }
                 }
                 fclose($this->socket);
+                if (isset($RESPONSE[0]) && $RESPONSE[0] == '!trap') {
+                    // the router answered and refused the login: retrying with the same data is pointless
+                    $this->fail = 'login';
+                    $this->fail_text = 'RouterOS rejected the user name or password.';
+                    break;
+                }
+                $this->fail = 'unreachable';
+                $this->fail_text = 'Connected, but the router did not complete the API login.';
+            } else {
+                $this->fail = 'unreachable';
+                $this->fail_text = trim($this->error_str . ($this->error_no ? ' (' . $this->error_no . ')' : ''));
+                if (in_array((int) $this->error_no, array(10061, 111, 61), true)) {
+                    // actively refused (Windows / Linux / BSD): the API service is off or blocked, so a retry cannot help
+                    break;
+                }
             }
-            sleep($this->delay);
+            if ($ATTEMPT < $this->attempts) {
+                sleep($this->delay);
+            }
         }
 
         if ($this->connected) {
+            $this->fail = '';
+            $this->fail_text = '';
             $this->debug('Connected...');
         } else {
             $this->debug('Error...');
@@ -341,7 +364,7 @@ class RouterosAPI
                 $receiveddone = true;
             }
 
-            $STATUS = socket_get_status($this->socket);
+            $STATUS = stream_get_meta_data($this->socket);
             if ($LENGTH > 0) {
                 $this->debug('>>> [' . $LENGTH . ', ' . $STATUS['unread_bytes'] . ']' . $_);
             }

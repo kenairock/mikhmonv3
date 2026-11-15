@@ -57,7 +57,9 @@ function mikhmon_session_cookie_params()
 /** Escape for HTML text and quoted attribute values. */
 function esc($value)
 {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    // ENT_SUBSTITUTE: bytes that are not valid UTF-8 (e.g. a localised OS error message or an odd
+    // router comment) become U+FFFD instead of making the whole string disappear
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
 /** Encode as a JavaScript string literal (quotes included), safe inside <script>. */

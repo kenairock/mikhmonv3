@@ -72,7 +72,13 @@ if (!isset($_SESSION["mikhmon"])) {
   include_once('./lib/formatbytesbites.php');
   $API = new RouterosAPI();
   $API->debug = false;
-  $API->connect($iphost, $userhost, decrypt($passwdhost));
+  $routerup = $API->connect($iphost, $userhost, decrypt($passwdhost));
+  // Router down or login refused: say so, instead of rendering empty pages. Logout must still work.
+  if (!$routerup && !(isset($_GET['hotspot']) && $_GET['hotspot'] === 'logout')) {
+    include_once('./include/routererror.php');
+    mikhmon_router_error_page($API, $session, $iphost);
+    exit;
+  }
 
   // time zone of THIS router: learned once per browser session (not only when its dashboard is opened)
   if (!mikhmon_state_has($session, 'timezone')) {
