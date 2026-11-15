@@ -62,6 +62,20 @@ if ($dbok && isset($_POST['acct_action'])) {
       $accterr = $e;
       mikhmon_audit('account.password-reset', $tname, $e, 'failed');
     }
+  } elseif ($act === 'reset2fa') {
+    if ($self) {
+      $e = 'Use My account to manage your own two-factor authentication.';
+    } else {
+      mikhmon_2fa_disable($target['id']);
+      $e = '';
+    }
+    if ($e === '') {
+      $acctmsg = 'Two-factor authentication reset for ' . $tname . '.' . (mikhmon_2fa_required($target) ? ' They must set it up again at their next sign-in.' : '');
+      mikhmon_audit('account.2fa-reset', $tname);
+    } else {
+      $accterr = $e;
+      mikhmon_audit('account.2fa-reset', $tname, $e, 'failed');
+    }
   } elseif ($act === 'delete') {
     $e = $self ? 'You cannot delete your own account.' : mikhmon_user_delete($target['id']);
     if ($e === '') {
@@ -97,7 +111,7 @@ $fmt = function ($ts) {
     <div style="overflow-x:auto;">
     <table class="table table-bordered table-hover text-nowrap">
       <thead>
-        <tr><th>Username</th><th>Role / status</th><th>Reset password</th><th>Last login</th><th>Created</th><th></th></tr>
+        <tr><th>Username</th><th>Role / status</th><th>2FA</th><th>Reset password</th><th>Last login</th><th>Created</th><th></th></tr>
       </thead>
       <tbody>
       <?php foreach ($accounts as $a) {
@@ -117,6 +131,21 @@ $fmt = function ($ts) {
               <label style="margin:0 6px;"><input type="checkbox" name="active" value="1" <?= (int) $a['active'] === 1 ? 'checked' : '' ?>> active</label>
               <button type="submit" class="btn bg-primary" title="Save role and status"><i class="fa fa-save"></i></button>
             </form>
+          </td>
+          <td>
+            <?php if (mikhmon_2fa_enabled($a)) { ?>
+              <b class="text-green">On</b>
+              <?php if (!$isself) { ?>
+              <form method="post" action="./admin.php?id=accounts" style="display:inline;" onsubmit="return confirm('Reset two-factor authentication for this account? They will have to set it up again.');">
+                <?= csrf_field() ?>
+                <input type="hidden" name="acct_action" value="reset2fa">
+                <input type="hidden" name="uid" value="<?= (int) $a['id'] ?>">
+                <button type="submit" class="btn bg-warning" title="Reset two-factor authentication (lost phone)"><i class="fa fa-undo"></i></button>
+              </form>
+              <?php } ?>
+            <?php } else { ?>
+              <span class="<?= $a['role'] === 'admin' ? 'text-red' : 'muted' ?>"><?= $a['role'] === 'admin' ? 'Not set up' : 'Off' ?></span>
+            <?php } ?>
           </td>
           <td>
             <form method="post" action="./admin.php?id=accounts" style="display:inline;">

@@ -84,15 +84,20 @@ if ($id == "login" || substr($url, -1) == "p") {
       $error = '<div class="alert bg-danger" role="alert"><i class="fa fa-ban"></i> Too many failed logins. Try again in ' . ceil($wait / 60) . ' minute(s).</div>';
     } elseif ($auth['ok']) {
       mikhmon_rate_clear('login');
-      mikhmon_start_user_session($auth['user']);
-      mikhmon_log_login($auth['user']['username'], true);
-      mikhmon_audit('login', $auth['user']['username'], 'role=' . $auth['user']['role']);
       // the database bootstrap may have rewritten config.php: reload before saving it again
       $data = mikhmon_load_config_data();
       // re-encrypt router passwords stored in the old format (and, without SQLite, hash the admin password)
       mikhmon_upgrade_stored_secrets($data, $pass, !empty($auth['user']['legacy_upgrade']));
 
+      if (mikhmon_2fa_begin_login($auth['user'])) {
+        // password is right, but the second step (code, or first-time setup for admins) is still to come
+        echo "<script>window.location='./admin.php?id=2fa'</script>";
+      } else {
+        mikhmon_start_user_session($auth['user']);
+        mikhmon_log_login($auth['user']['username'], true);
+        mikhmon_audit('login', $auth['user']['username'], 'role=' . $auth['user']['role']);
         echo "<script>window.location='./admin.php?id=sessions'</script>";
+      }
 
     } else {
       mikhmon_rate_hit('login');
@@ -105,6 +110,8 @@ if ($id == "login" || substr($url, -1) == "p") {
   
 
   include_once('./include/login.php');
+} elseif ($id == "2fa") {
+  include('./include/twofactor.php');
 } elseif (!isset($_SESSION["mikhmon"])) {
   echo "<script>window.location='./admin.php?id=login'</script>";
 } elseif (substr($url, -1) == "/" || substr($url, -4) == ".php") {

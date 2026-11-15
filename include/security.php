@@ -420,7 +420,10 @@ function mikhmon_refresh_session_user()
     }
     $uid = isset($_SESSION['mikhmon_uid']) ? (int) $_SESSION['mikhmon_uid'] : 0;
     $user = $uid > 0 ? mikhmon_user_by_id($uid) : null;
-    if (!$user || (int) $user['active'] !== 1 || strcasecmp((string) $user['username'], (string) $_SESSION['mikhmon']) !== 0) {
+    // An admin without two-factor authentication is signed out: sessions that pre-date the rule, a user
+    // promoted to admin, or an admin whose 2FA was reset must go through the login (and enrol) again.
+    if (!$user || (int) $user['active'] !== 1 || strcasecmp((string) $user['username'], (string) $_SESSION['mikhmon']) !== 0
+        || (mikhmon_2fa_required($user) && !mikhmon_2fa_enabled($user))) {
         $_SESSION = array();
         session_regenerate_id(true);
         echo "<script>window.top.location=" . esc_js(mikhmon_base_url() . 'admin.php?id=login') . ";</script>";
@@ -484,7 +487,7 @@ function mikhmon_required_role()
         if (in_array($id, mikhmon_admin_page_ids(), true) || $get('router') !== '') {
             return 'admin';
         }
-        if (mikhmon_is_post() && !in_array($id, array('login', 'account'), true)) {
+        if (mikhmon_is_post() && !in_array($id, array('login', 'account', '2fa'), true)) {
             return 'admin';
         }
     }
@@ -508,7 +511,7 @@ function mikhmon_required_role()
         return 'operator';
     }
     if (mikhmon_is_post()) {
-        return ($script === 'admin.php' && in_array($id, array('login', 'account'), true)) ? 'viewer' : 'operator';
+        return ($script === 'admin.php' && in_array($id, array('login', 'account', '2fa'), true)) ? 'viewer' : 'operator';
     }
     return 'viewer';
 }
@@ -539,7 +542,7 @@ function mikhmon_request_action()
     $page = mikhmon_request_page();
 
     if (mikhmon_is_post()) {
-        if ($script === 'admin.php' && isset($g['id']) && in_array($g['id'], array('login', 'accounts', 'account'), true)) {
+        if ($script === 'admin.php' && isset($g['id']) && in_array($g['id'], array('login', 'accounts', 'account', '2fa'), true)) {
             return null; // logged explicitly with better detail
         }
         $fields = array();
@@ -914,3 +917,4 @@ function mikhmon_rate_clear($bucket)
 } // MIKHMON_SECURITY
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/totp.php';

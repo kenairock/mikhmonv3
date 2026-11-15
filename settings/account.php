@@ -34,6 +34,41 @@ if ($me && isset($_POST['change_password'])) {
     }
   }
 }
+// ---- two-factor authentication ------------------------------------------------------------
+$newcodes = null;
+if ($me && isset($_POST['twofa_action'])) {
+  $act = mikhmon_input($_POST, 'twofa_action');
+  $enabled = mikhmon_2fa_enabled($me);
+  if ($act === 'enable' && !$enabled) {
+    mikhmon_2fa_begin_self_enrol($me['id']);
+    echo "<script>window.location='./admin.php?id=2fa'</script>";
+    return;
+  } elseif (in_array($act, array('regenerate', 'disable'), true) && $enabled) {
+    $ignored = false;
+    $method = '';
+    if (!mikhmon_password_matches(mikhmon_input($_POST, 'twofa_password'), $me['password_hash'], $ignored)) {
+      $ownerr = 'Current password is wrong.';
+    } elseif ($act === 'disable' && mikhmon_2fa_required($me)) {
+      $ownerr = 'Admin accounts cannot turn two-factor authentication off.';
+    } else {
+      $ownerr = mikhmon_2fa_check($me, mikhmon_input($_POST, 'twofa_code'), false, $method);
+    }
+    if ($ownerr === '') {
+      if ($act === 'regenerate') {
+        $newcodes = mikhmon_recovery_regenerate($me['id']);
+        $ownmsg = 'New recovery codes created. The old ones no longer work.';
+        mikhmon_audit('account.2fa-recovery-new', $me['username']);
+      } else {
+        mikhmon_2fa_disable($me['id']);
+        $ownmsg = 'Two-factor authentication turned off.';
+        mikhmon_audit('account.2fa-disable', $me['username'], 'by the user');
+      }
+      $me = mikhmon_user_by_id($me['id']);
+    } else {
+      mikhmon_audit($act === 'disable' ? 'account.2fa-disable' : 'account.2fa-recovery-new', $me['username'], $ownerr, 'failed');
+    }
+  }
+}
 $ignored = false;
 $isdefault = $me && strtolower($me['username']) === 'mikhmon' && mikhmon_password_matches('1234', $me['password_hash'], $ignored);
 ?>
@@ -69,4 +104,46 @@ $isdefault = $me && strtolower($me['username']) === 'mikhmon' && mikhmon_passwor
   </div>
 </div>
 </div>
+
+<?php if ($me) {
+  $tfaOn = mikhmon_2fa_enabled($me);
+  $tfaMust = mikhmon_2fa_required($me); ?>
+<div class="col-6">
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fa fa-shield"></i> Two-factor authentication</h3>
+  </div>
+  <div class="card-body">
+    <p style="margin-top:0;">Status:
+      <?php if ($tfaOn) { ?><b class="text-green">On</b> &nbsp; <span class="muted"><?= (int) mikhmon_recovery_remaining($me['id']) ?> recovery codes left</span>
+      <?php } else { ?><b class="text-red">Off</b><?php } ?>
+      <?= $tfaMust ? ' &nbsp; <span class="muted">(required for admins)</span>' : '' ?></p>
+
+    <?php if ($newcodes !== null) { ?>
+      <p>Save these recovery codes. Each works once, and they are not shown again.</p>
+      <pre style="font-size:16px;line-height:1.8;text-align:center;background:var(--surface-2,#f3f5f7);border-radius:8px;padding:12px;user-select:all;"><?php foreach ($newcodes as $c) { echo esc($c) . "\n"; } ?></pre>
+    <?php } ?>
+
+    <?php if (!$tfaOn) { ?>
+      <p>Adds a 6-digit code from an authenticator app to your sign-in.</p>
+      <form method="post" action="./admin.php?id=account"><?= csrf_field() ?>
+        <input type="hidden" name="twofa_action" value="enable">
+        <button type="submit" class="btn bg-primary"><i class="fa fa-shield"></i> Set up</button>
+      </form>
+    <?php } else { ?>
+      <form method="post" action="./admin.php?id=account" autocomplete="off"><?= csrf_field() ?>
+        <table class="table table-sm">
+          <tr><td class="align-middle">Password</td><td><input class="form-control" type="password" name="twofa_password" autocomplete="current-password" required></td></tr>
+          <tr><td class="align-middle">Code from app</td><td><input class="form-control" type="text" name="twofa_code" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" autocomplete="one-time-code" required></td></tr>
+          <tr><td></td><td>
+            <button type="submit" name="twofa_action" value="regenerate" class="btn bg-warning"><i class="fa fa-refresh"></i> New recovery codes</button>
+            <?php if (!$tfaMust) { ?><button type="submit" name="twofa_action" value="disable" class="btn bg-danger" onclick="return confirm('Turn two-factor authentication off?');"><i class="fa fa-times"></i> Turn off</button><?php } ?>
+          </td></tr>
+        </table>
+      </form>
+    <?php } ?>
+  </div>
+</div>
+</div>
+<?php } ?>
 </div>

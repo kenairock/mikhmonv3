@@ -17,7 +17,7 @@ if (basename($_SERVER['SCRIPT_FILENAME']) == 'db.php') {
 if (!defined('MIKHMON_DB_LAYER')) {
 define('MIKHMON_DB_LAYER', true);
 
-define('MIKHMON_DB_SCHEMA_VERSION', 1);
+define('MIKHMON_DB_SCHEMA_VERSION', 2);
 // Login history and audit entries older than this are pruned automatically.
 define('MIKHMON_LOG_RETENTION_DAYS', 365);
 
@@ -128,6 +128,21 @@ function mikhmon_db_migrate(PDO $db)
         $db->exec('CREATE INDEX IF NOT EXISTS idx_login_user ON login_log (username)');
         $db->exec('CREATE INDEX IF NOT EXISTS idx_audit_ts ON audit_log (ts)');
         $db->exec('CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log (username)');
+    }
+    if ($version < 2) {
+        // two-factor authentication (TOTP) + one-time recovery codes
+        $db->exec('ALTER TABLE users ADD COLUMN totp_secret TEXT');
+        $db->exec('ALTER TABLE users ADD COLUMN totp_enabled INTEGER NOT NULL DEFAULT 0');
+        $db->exec('ALTER TABLE users ADD COLUMN totp_last_step INTEGER NOT NULL DEFAULT 0');
+        $db->exec('ALTER TABLE users ADD COLUMN totp_fails INTEGER NOT NULL DEFAULT 0');
+        $db->exec('ALTER TABLE users ADD COLUMN totp_locked_until INTEGER NOT NULL DEFAULT 0');
+        $db->exec("CREATE TABLE IF NOT EXISTS recovery_codes (
+            id        INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id   INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+            code_hash TEXT    NOT NULL,
+            used_at   INTEGER
+        )");
+        $db->exec('CREATE INDEX IF NOT EXISTS idx_recovery_user ON recovery_codes (user_id)');
     }
     $db->exec('PRAGMA user_version = ' . (int) MIKHMON_DB_SCHEMA_VERSION);
     $db->commit();
