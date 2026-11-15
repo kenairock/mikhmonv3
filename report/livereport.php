@@ -27,7 +27,7 @@ if (!isset($_SESSION["mikhmon"])) {
 // load session MikroTik
   $session = mikhmon_session_param();
 // set  timezone
-date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
+mikhmon_apply_router_timezone($session);
 
 // lang
 include('../include/lang.php');

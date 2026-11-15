@@ -43,7 +43,7 @@ if (!isset($_SESSION["mikhmon"])) {
   $_SESSION["connect"] = "";
 
 // time zone
-  date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
+  mikhmon_apply_router_timezone($session);
 
 // lang
   include('./include/lang.php');
@@ -73,6 +73,13 @@ if (!isset($_SESSION["mikhmon"])) {
   $API = new RouterosAPI();
   $API->debug = false;
   $API->connect($iphost, $userhost, decrypt($passwdhost));
+
+  // time zone of THIS router: learned once per browser session (not only when its dashboard is opened)
+  if (!mikhmon_state_has($session, 'timezone')) {
+    $getclocktz = $API->comm("/system/clock/print");
+    mikhmon_state_set($session, 'timezone', mikhmon_router_timezone(isset($getclocktz[0]['time-zone-name']) ? $getclocktz[0]['time-zone-name'] : ''));
+    mikhmon_apply_router_timezone($session);
+  }
 
   $getidentity = $API->comm("/system/identity/print");
   $identity = $getidentity[0]['name'];
@@ -150,13 +157,13 @@ if (!isset($_SESSION["mikhmon"])) {
   elseif (substr(explode("=", $url)[0],-9) == "/?session") {
 
     include_once('./dashboard/home.php');
-    $_SESSION['ubn'] = "";
+    mikhmon_state_set($session, 'ubn', "");
   }
 
 // redirect to home
   elseif ($hotspot == "dashboard") {
     include_once('./dashboard/home.php');
-    $_SESSION['ubn'] = "";
+    mikhmon_state_set($session, 'ubn', "");
 
   }
 
@@ -184,43 +191,43 @@ if (!isset($_SESSION["mikhmon"])) {
 
 // hotspot add users
   elseif ($hotspot == "add-user") {
-    $_SESSION['hua'] = "";
+    mikhmon_state_set($session, 'hua', "");
     include_once('./hotspot/adduser.php');
   }
 
 // hotspot users
   elseif ($hotspot == "users" && $prof == "all") {
-    $_SESSION['ubp'] = "";
-    $_SESSION['hua'] = "";
-    $_SESSION['ubc'] = "";
-    $_SESSION['vcr'] = "";
+    mikhmon_state_set($session, 'ubp', "");
+    mikhmon_state_set($session, 'hua', "");
+    mikhmon_state_set($session, 'ubc', "");
+    mikhmon_state_set($session, 'vcr', "");
     include_once('./hotspot/users.php');
   }
 
 // hotspot users filter by profile
   elseif ($hotspot == "users" && $prof != "") {
-    $_SESSION['ubp'] = $prof;
-    $_SESSION['hua'] = "";
-    $_SESSION['ubc'] = "";
-    $_SESSION['vcr'] = "";
+    mikhmon_state_set($session, 'ubp', $prof);
+    mikhmon_state_set($session, 'hua', "");
+    mikhmon_state_set($session, 'ubc', "");
+    mikhmon_state_set($session, 'vcr', "");
     include_once('./hotspot/users.php');
   }
 
 // hotspot users filter by comment
   elseif ($hotspot == "users" && $comm != "") {
-    $_SESSION['ubc'] = $comm;
-    $_SESSION['hua'] = "";
-    $_SESSION['ubp'] = "";
-    $_SESSION['vcr'] = "";
+    mikhmon_state_set($session, 'ubc', $comm);
+    mikhmon_state_set($session, 'hua', "");
+    mikhmon_state_set($session, 'ubp', "");
+    mikhmon_state_set($session, 'vcr', "");
     include_once('./hotspot/users.php');
   }
 
 // hotspot by profile
   elseif ($hotspot == "users-by-profile") {
-    $_SESSION['ubp'] = "";
-    $_SESSION['hua'] = "";
-    $_SESSION['ubc'] = "";
-    $_SESSION['vcr'] = "active";
+    mikhmon_state_set($session, 'ubp', "");
+    mikhmon_state_set($session, 'hua', "");
+    mikhmon_state_set($session, 'ubc', "");
+    mikhmon_state_set($session, 'vcr', "active");
     include_once('./hotspot/userbyprofile.php');
   }
 // export hotspot users
@@ -252,11 +259,11 @@ elseif ($hotspot == "list-quick-print") {
 
 // hotspot users filter by name
   elseif (substr($hotspotuser, 0, 1) == "*") {
-    $_SESSION['ubn'] = $hotspotuser;
-    $_SESSION['hua'] = "";
+    mikhmon_state_set($session, 'ubn', $hotspotuser);
+    mikhmon_state_set($session, 'hua', "");
     include_once('./hotspot/userbyname.php');
   } elseif ($hotspotuser != "") {
-    $_SESSION['ubn'] = $hotspotuser;
+    mikhmon_state_set($session, 'ubn', $hotspotuser);
     include_once('./hotspot/userbyname.php');
   }
 
@@ -329,9 +336,9 @@ elseif ($removeexpiredhotspotuser != "") {
 
 // hotspot active
   elseif ($hotspot == "active") {
-    $_SESSION['ubp'] = "";
-    $_SESSION['hua'] = "hotspotactive";
-    $_SESSION['ubc'] = "";
+    mikhmon_state_set($session, 'ubp', "");
+    mikhmon_state_set($session, 'hua', "hotspotactive");
+    mikhmon_state_set($session, 'ubc', "");
     include_once('./hotspot/hotspotactive.php');
   }
 

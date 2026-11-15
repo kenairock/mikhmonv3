@@ -23,7 +23,7 @@ if (!isset($_SESSION["mikhmon"])) {
   header("Location:../admin.php?id=login");
 } else {
 
-  date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
+  mikhmon_apply_router_timezone($session);
 
   $getprofile = $API->comm("/ip/hotspot/user/profile/print");
   $srvlist = $API->comm("/ip/hotspot/print");
@@ -288,17 +288,17 @@ include('./voucher/printbt.php');
 <div class="card-body">
 <form autocomplete="new-password" method="post" action=""><?= csrf_field() ?>
   <div>
-    <?php if ($_SESSION['ubp'] != "") {
-      echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";
-    } elseif ($_SESSION['ubc'] != "") {
-      echo "    <a class='btn bg-warning' href='./?hotspot=users&comment=" . $_SESSION['ubc'] . "&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";
-    } elseif ($_SESSION['hua'] != "") {
-      $_SESSION['ubn'] = "";
+    <?php if (mikhmon_state_get($session, 'ubp') != "") {
+      echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . mikhmon_state_get($session, 'ubp') . "&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";
+    } elseif (mikhmon_state_get($session, 'ubc') != "") {
+      echo "    <a class='btn bg-warning' href='./?hotspot=users&comment=" . mikhmon_state_get($session, 'ubc') . "&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";
+    } elseif (mikhmon_state_get($session, 'hua') != "") {
+      mikhmon_state_set($session, 'ubn', "");
       echo "    <a class='btn bg-warning' href='./?hotspot=active&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";
-      $_SESSION['hua'] = "";
-    } elseif ($_SESSION['ubn'] != "") {
+      mikhmon_state_set($session, 'hua', "");
+    } elseif (mikhmon_state_get($session, 'ubn') != "") {
       echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=all&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";
-      $_SESSION['ubn'] = "";
+      mikhmon_state_set($session, 'ubn', "");
     } else {
       echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=all&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";
     }

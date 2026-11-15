@@ -27,7 +27,7 @@ if (!isset($_SESSION["mikhmon"])) {
   $getclock = $API->comm("/system/clock/print");
   $clock = $getclock[0];
   $timezone = mikhmon_router_timezone($getclock[0]['time-zone-name']);
-  $_SESSION['timezone'] = $timezone;
+  mikhmon_state_set($session, 'timezone', $timezone);
   if ($timezone !== '') {
     date_default_timezone_set($timezone);
   }

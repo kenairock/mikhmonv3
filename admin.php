@@ -166,6 +166,7 @@ if ($id == "login" || substr($url, -1) == "p") {
   include_once('./include/menu.php');
   if ($session !== "mikhmon" && isset($data[$session])) {
     unset($data[$session]);
+    mikhmon_state_clear($session);
     mikhmon_save_config($data);
   }
   echo "<script>window.location='./admin.php?id=sessions'</script>";

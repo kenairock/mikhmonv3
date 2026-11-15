@@ -59,10 +59,10 @@ if ($removehotspotusers != "") {
 
 	}
 
-	if ($_SESSION['ubp'] != "") {
-		echo "<script>window.location='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'</script>";
-	} elseif ($_SESSION['ubc'] != "") {
-		echo "<script>window.location='./?hotspot=users&comment=" . $_SESSION['ubc'] . "&session=" . $session . "'</script>";
+	if (mikhmon_state_get($session, 'ubp') != "") {
+		echo "<script>window.location='./?hotspot=users&profile=" . mikhmon_state_get($session, 'ubp') . "&session=" . $session . "'</script>";
+	} elseif (mikhmon_state_get($session, 'ubc') != "") {
+		echo "<script>window.location='./?hotspot=users&comment=" . mikhmon_state_get($session, 'ubc') . "&session=" . $session . "'</script>";
 	} else {
 		echo "<script>window.location='./?hotspot=users&profile=all&session=" . $session . "'</script>";
 	}
@@ -100,10 +100,10 @@ if ($removehotspotusers != "") {
 	));
 
 
-	if ($_SESSION['ubp'] != "") {
-		echo "<script>window.location='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'</script>";
-	} elseif ($_SESSION['ubc'] != "") {
-		echo "<script>window.location='./?hotspot=users&comment=" . $_SESSION['ubc'] . "&session=" . $session . "'</script>";
+	if (mikhmon_state_get($session, 'ubp') != "") {
+		echo "<script>window.location='./?hotspot=users&profile=" . mikhmon_state_get($session, 'ubp') . "&session=" . $session . "'</script>";
+	} elseif (mikhmon_state_get($session, 'ubc') != "") {
+		echo "<script>window.location='./?hotspot=users&comment=" . mikhmon_state_get($session, 'ubc') . "&session=" . $session . "'</script>";
 	} else {
 		echo "<script>window.location='./?hotspot=users&profile=all&session=" . $session . "'</script>";
 	}

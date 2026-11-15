@@ -27,10 +27,10 @@ if (!isset($_SESSION["mikhmon"])) {
 } else {
 
 // time zone
-date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
 	
 // load session MikroTik
 $session = mikhmon_session_param();
+mikhmon_apply_router_timezone($session);
 
 $quickprint = $_GET['quickprint'];
 $qty = 1;

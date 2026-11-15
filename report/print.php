@@ -46,13 +46,13 @@ if (!isset($_SESSION["mikhmon"])) {
 	$idbl = $_GET['idbl'];
 	$idbl2 = explode("/",$idhr)[0].explode("/",$idhr)[2];
 	if ($idhr != ""){
-		$_SESSION['report'] = "&idhr=".$idhr;
+		mikhmon_state_set($session, 'report', "&idhr=".$idhr);
 	} elseif ($idbl != ""){
-		$_SESSION['report'] = "&idbl=".$idbl;
+		mikhmon_state_set($session, 'report', "&idbl=".$idbl);
 	} else {
-		$_SESSION['report'] = "";
+		mikhmon_state_set($session, 'report', "");
 	}
-	$_SESSION['idbl'] = $idbl;
+	mikhmon_state_set($session, 'idbl', $idbl);
 	$remdata = ($_POST['remdata']);
 	$prefix = $_GET['prefix'];
 	$fcomment = $_GET['comment'];
@@ -431,8 +431,8 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 				
 				$dataresume .= $getname[0].$getname[3];
 				$totalresume += $getname[3];
-				$_SESSION['dataresume'] = $dataresume;
-				$_SESSION['totalresume'] = $TotalReg.'/'.$totalresume;
+				mikhmon_state_set($session, 'dataresume', $dataresume);
+				mikhmon_state_set($session, 'totalresume', $TotalReg.'/'.$totalresume);
 				}
 					
 			}

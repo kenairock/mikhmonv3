@@ -25,7 +25,7 @@ if (!isset($_SESSION["mikhmon"])) {
 	header("Location:../admin.php?id=login");
 } else {
 // time zone
-date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
+mikhmon_apply_router_timezone($session);
 
 	$genprof = $_GET['genprof'];
 	if ($genprof != "") {
@@ -94,7 +94,7 @@ date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] 
 		$getprice = explode(",", $ponlogin)[2];
 		$getsprice = explode(",", $ponlogin)[4];
 		$getlock = explode(",", $ponlogin)[6];
-		$_SESSION['ubp'] = $profile;
+		mikhmon_state_set($session, 'ubp', $profile);
 		$commt = $user . "-" . rand(100, 999) . "-" . date("m.d.y") . "-" . $adcomment;
 		$gentemp = $commt . "|~" . $profile . "~" . $getvalid . "~" . $getprice . "!".$getsprice."~" . $timelimit . "~" . $datalimit . "~" . $getlock;
 		mikhmon_write_php_var('./voucher/temp.php', array('genu' => encrypt($gentemp)));
@@ -289,9 +289,9 @@ date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] 
 	<div class="card-body">
 <form autocomplete="off" method="post" action=""><?= csrf_field() ?>
 	<div>
-		<?php if ($_SESSION['ubp'] != "") {
-		echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";
-	} elseif ($_SESSION['vcr'] = "active") {
+		<?php if (mikhmon_state_get($session, 'ubp') != "") {
+		echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . mikhmon_state_get($session, 'ubp') . "&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";
+	} elseif (mikhmon_state_get($session, 'vcr') == "active") {
 		echo "    <a class='btn bg-warning' href='./?hotspot=users-by-profile&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";
 	} else {
 		echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=all&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";
@@ -299,12 +299,12 @@ date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] 
 
 	?>
 	<a class="btn bg-pink" title="Open User List by Profile 
-<?php if ($_SESSION['ubp'] == "") {
+<?php if (mikhmon_state_get($session, 'ubp') == "") {
 	echo "all";
 } else {
 	echo $uprofile;
 } ?>" href="./?hotspot=users&profile=
-<?php if ($_SESSION['ubp'] == "") {
+<?php if (mikhmon_state_get($session, 'ubp') == "") {
 	echo "all";
 } else {
 	echo $uprofile;

@@ -90,8 +90,8 @@ if (!isset($_SESSION["mikhmon"])) {
   <div class="card-body">
 <form autocomplete="off" method="post" action=""><?= csrf_field() ?>  
   <div>
-  <?php if ($_SESSION['ubp'] != "") {
-    echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";
+  <?php if (mikhmon_state_get($session, 'ubp') != "") {
+    echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . mikhmon_state_get($session, 'ubp') . "&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";
   } else {
     echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=all&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";
   }

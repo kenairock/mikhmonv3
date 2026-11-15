@@ -161,6 +161,47 @@ function mikhmon_router_timezone($name)
 }
 
 // ---------------------------------------------------------------------------
+// Per-router state
+// ---------------------------------------------------------------------------
+// Mikhmon can manage several routers from one browser session (even in two tabs). Anything
+// that belongs to ONE router - report caches, list filters, the router's time zone - must not
+// be shared, or router A would show router B's numbers. It is kept in
+// $_SESSION['rstate'][<router session name>][<key>].
+
+function mikhmon_state_get($router, $key, $default = '')
+{
+    $router = (string) $router;
+    return isset($_SESSION['rstate'][$router]) && array_key_exists($key, $_SESSION['rstate'][$router])
+        ? $_SESSION['rstate'][$router][$key]
+        : $default;
+}
+
+function mikhmon_state_set($router, $key, $value)
+{
+    $_SESSION['rstate'][(string) $router][$key] = $value;
+}
+
+function mikhmon_state_has($router, $key)
+{
+    return isset($_SESSION['rstate'][(string) $router]) && array_key_exists($key, $_SESSION['rstate'][(string) $router]);
+}
+
+/** Forget everything stored for one router (when it is deleted). */
+function mikhmon_state_clear($router)
+{
+    unset($_SESSION['rstate'][(string) $router]);
+}
+
+/** Use this router's own time zone for date()/strtotime() when it is known and valid. */
+function mikhmon_apply_router_timezone($router)
+{
+    $tz = (string) mikhmon_state_get($router, 'timezone', '');
+    if ($tz !== '' && mikhmon_router_timezone($tz) !== '') {
+        date_default_timezone_set($tz);
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Session (router) names
 // ---------------------------------------------------------------------------
 

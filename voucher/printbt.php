@@ -1,4 +1,4 @@
-<?php date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get()); ?>
+<?php mikhmon_apply_router_timezone($session); ?>
 <script>
 function sendToQuickPrinterChrome(){
  

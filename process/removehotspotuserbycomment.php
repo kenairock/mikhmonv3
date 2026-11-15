@@ -26,8 +26,8 @@ $getuser = $API->comm("/ip/hotspot/user/print", array(
 ));
 $TotalReg = count($getuser);
 
-$_SESSION['ubp'] = $getuser[0]['profile'];
-$_SESSION['ubc'] = "";
+mikhmon_state_set($session, 'ubp', $getuser[0]['profile']);
+mikhmon_state_set($session, 'ubc', "");
 
 for ($i = 0; $i < $TotalReg; $i++) {
   $userdetails = $getuser[$i];
@@ -37,8 +37,8 @@ for ($i = 0; $i < $TotalReg; $i++) {
     ".id" => "$uid",
   ));
 }
-if ($_SESSION['ubp'] != "") {
-  echo "<script>window.location='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'</script>";
+if (mikhmon_state_get($session, 'ubp') != "") {
+  echo "<script>window.location='./?hotspot=users&profile=" . mikhmon_state_get($session, 'ubp') . "&session=" . $session . "'</script>";
 } else {
   echo "<script>window.location='./?hotspot=users&profile=all&session=" . $session . "'</script>";
 }

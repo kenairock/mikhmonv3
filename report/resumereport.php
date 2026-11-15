@@ -54,7 +54,7 @@ if ($mn == date("n")){
 }
 
 function resume_per_day($date){
-$evalue =  explode($date,$_SESSION['dataresume']);
+$evalue =  explode($date,mikhmon_state_get($session, 'dataresume'));
 $x = count($evalue);
 			for ($i = 0; $i < $x; $i++) {
 				$result += (int) $evalue[$i];
@@ -62,8 +62,8 @@ $x = count($evalue);
 			return ($x-1).'/'.$result;
 }
 
-$totalvrc =  explode("/",$_SESSION['totalresume'])[0];
-$totalincome = explode("/",$_SESSION['totalresume'])[1];
+$totalvrc =  explode("/",mikhmon_state_get($session, 'totalresume'))[0];
+$totalincome = explode("/",mikhmon_state_get($session, 'totalresume'))[1];
 
 
 if ($currency == in_array($currency, $cekindo['indo'])) {

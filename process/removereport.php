@@ -35,4 +35,4 @@ if (!isset($_SESSION["mikhmon"]) || !isset($API)) { header("Location:../admin.ph
 		}
 		$_SESSION[$session.'idhr'] = "";
 	}
-	echo "<script>window.location='./?report=selling".$_SESSION['report']."&session=" . $session . "'</script>";
+	echo "<script>window.location='./?report=selling".mikhmon_state_get($session, 'report')."&session=" . $session . "'</script>";
