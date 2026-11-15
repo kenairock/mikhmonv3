@@ -59,7 +59,9 @@ if ($currency == in_array($currency, $cekindo['indo'])) {
 <meta http-equiv="pragma" content="no-cache" />
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
 <!-- Font Awesome -->
-<link rel="stylesheet" type="text/css" href="../css/font-awesome/css/font-awesome.min.css" />
+<!-- Font Awesome Free 7.3.1 (+ v4 shims for the few old icon names) -->
+<link rel="stylesheet" href="../css/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="../css/fontawesome/css/v4-shims.min.css">
 <!-- Mikhmon UI -->
 <link rel="stylesheet" href="../css/mikhmon-ui.<?= $theme; ?>.min.css">
 <link rel="icon" href="../img/favicon.png" />

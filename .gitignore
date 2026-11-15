@@ -4,3 +4,6 @@ include/.ratelimit.json
 include/mikhmon.sqlite
 include/mikhmon.sqlite-wal
 include/mikhmon.sqlite-shm
+
+# Original Font Awesome 7.3.1 download (44 MB: svgs, sprites, metadata...). The app uses the trimmed copy in css/fontawesome/
+css/fontawesome-free-7.3.1-web/

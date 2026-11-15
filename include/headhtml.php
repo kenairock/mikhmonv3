@@ -31,7 +31,9 @@ error_reporting(0);
 		<!-- Theme color -->
 		<meta name="theme-color" content="<?= $themecolor ?>" />
 		<!-- Font Awesome -->
-		<link rel="stylesheet" type="text/css" href="css/font-awesome/css/font-awesome.min.css" />
+		<!-- Font Awesome Free 7.3.1 (+ v4 shims for the few old icon names) -->
+		<link rel="stylesheet" href="css/fontawesome/css/all.min.css">
+		<link rel="stylesheet" href="css/fontawesome/css/v4-shims.min.css">
 		<!-- Mikhmon UI -->
 		<link rel="stylesheet" href="css/mikhmon-ui.<?= $theme; ?>.min.css">
 		<!-- favicon -->
