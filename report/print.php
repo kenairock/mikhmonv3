@@ -65,8 +65,10 @@ if (!isset($_SESSION["mikhmon"])) {
 	}else{$fcomment = $fcomment;}
 
 	$gettimezone = $API->comm("/system/clock/print");
-	$timezone = $gettimezone[0]['time-zone-name'];
-	date_default_timezone_set($timezone);
+	$timezone = mikhmon_router_timezone($gettimezone[0]['time-zone-name']);
+	if ($timezone !== '') {
+		date_default_timezone_set($timezone);
+	}
 
 	if (isset($remdata)) {
 		if (strlen($idhr) > "0") {

@@ -129,6 +129,38 @@ function mikhmon_theme_head_script()
 }
 
 // ---------------------------------------------------------------------------
+// RouterOS date / time zone compatibility
+// ---------------------------------------------------------------------------
+
+/**
+ * RouterOS 6 reports dates as "nov/15/2026"; RouterOS 7 (7.25 checked) as "2026-11-15".
+ * Mikhmon's reports, voucher expiry and live income all use the first form, so convert.
+ * Anything that is not an ISO date is returned unchanged.
+ */
+function mikhmon_router_date($date)
+{
+    $date = (string) $date;
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $m)) {
+        $months = array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec');
+        $i = (int) $m[2] - 1;
+        if (isset($months[$i])) {
+            return $months[$i] . '/' . $m[3] . '/' . $m[1];
+        }
+    }
+    return $date;
+}
+
+/**
+ * Time zone name reported by the router, if PHP knows it. Routers set to a manual offset report
+ * "manual" (and others report names PHP lacks); those return '' so callers keep PHP's own zone.
+ */
+function mikhmon_router_timezone($name)
+{
+    $name = (string) $name;
+    return ($name !== '' && in_array($name, timezone_identifiers_list(), true)) ? $name : '';
+}
+
+// ---------------------------------------------------------------------------
 // Session (router) names
 // ---------------------------------------------------------------------------
 

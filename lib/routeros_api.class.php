@@ -181,7 +181,7 @@ class RouterosAPI
                     } else {
                         $CURRENT =& $PARSED[$x][];
                     }
-                } elseif ($x != '!done') {
+                } elseif ($x != '!done' && $x != '!empty') {
                     $MATCHES = array();
                     if (preg_match_all('/[^=]+/i', $x, $MATCHES)) {
                         if ($MATCHES[0][0] == 'ret') {
@@ -223,7 +223,7 @@ class RouterosAPI
                     } else {
                         $CURRENT =& $PARSED[$x][];
                     }
-                } elseif ($x != '!done') {
+                } elseif ($x != '!done' && $x != '!empty') {
                     $MATCHES = array();
                     if (preg_match_all('/[^=]+/i', $x, $MATCHES)) {
                         if ($MATCHES[0][0] == 'ret') {
