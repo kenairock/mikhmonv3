@@ -211,7 +211,7 @@ if (!isset($_SESSION["mikhmon"])) {
     <h3><i class="fa fa-edit"></i> <?= $_edit." ".$_user_profile ?> </h3>
 </div>
 <div class="card-body">
-<form autocomplete="off" method="post" action="">
+<form autocomplete="off" method="post" action=""><?= csrf_field() ?>
   <div>
     <a class="btn bg-warning" href="./?hotspot=user-profiles&session=<?= $session; ?>"> <i class="fa fa-close"></i> <?= $_close?></a>
     <button type="submit" name="save" class="btn bg-primary" ><i class="fa fa-save"></i> <?= $_save ?></button>

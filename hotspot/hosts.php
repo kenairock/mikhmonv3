@@ -104,7 +104,7 @@ for ($i = 0; $i < $TotalReg; $i++) {
 	$uriprocess = "'./?remove-host=" . $id . "&session=" . $session . "'";
 
 	echo "<tr>";
-	echo "<td style='text-align:center;'><span class='pointer'  title='Remove " . $maca . "' onclick=loadpage(".$uriprocess.")><i class='fa fa-minus-square text-danger'></i></span></td>";
+	echo "<td style='text-align:center;'><span class='pointer'  title='Remove \" . esc($maca) . \"' onclick=loadpage(".$uriprocess.")><i class='fa fa-minus-square text-danger'></i></span></td>";
 	echo "<td style='text-align:center;'>";
 	if ($hosts['authorized'] == "true" && $hosts['DHCP'] == "true") {
 		echo "<b class='text-success' title='A - authorized, H - DHCP'>A H</b>";
@@ -121,11 +121,11 @@ for ($i = 0; $i < $TotalReg; $i++) {
 	} else {
 	}
 	echo "</td>";
-	echo "<td>" . $maca . "</td>";
-	echo "<td>" . $addr . "</td>";
-	echo "<td>" . $toaddr . "</td>";
-	echo "<td>" . $server . "</td>";
-	echo "<td>" . $commt . "</td>";
+	echo "<td>" . esc($maca) . "</td>";
+	echo "<td>" . esc($addr) . "</td>";
+	echo "<td>" . esc($toaddr) . "</td>";
+	echo "<td>" . esc($server) . "</td>";
+	echo "<td>" . esc($commt) . "</td>";
 	echo "</tr>";
 }
 ?>

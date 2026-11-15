@@ -40,7 +40,7 @@ if (!isset($_SESSION["mikhmon"])) {
         <h3 class="card-title"><i class="fa fa-power-off"></i> Shutdown MikroTik</h3>
     </div>
   	<div class="card-body text-center">
-  		<form action="" method="post" enctype="multipart/form-data">
+  		<form action="" method="post" enctype="multipart/form-data"><?= csrf_field() ?>
         <div>
           <h3><?= $_shutdown.' '. $session; ?>?</h3>
         </div>

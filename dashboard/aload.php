@@ -15,14 +15,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+include_once(__DIR__ . '/../include/security.php');
+mikhmon_session_cookie_params();
 session_start();
+mikhmon_guard_request();
 // hide all error
 error_reporting(0);
 if (!isset($_SESSION["mikhmon"])) {
   header("Location:../admin.php?id=login");
 } else {
 // load session MikroTik
-  $session = $_GET['session'];
+  $session = mikhmon_session_param();
   $load = $_GET['load'];
 
 // lang
@@ -247,20 +250,20 @@ include('../lang/'.$langid.'.php');
     $time = $log[$i]['time'];
     echo "<tr>";
     if (substr($log[$i]['message'], 0, 2) == "->") {
-      echo "<td>" . $time . "</td>";
+      echo "<td>" . esc($time) . "</td>";
     //echo substr($mess[1], 0,2);
       echo "<td>";
       if (count($mess) > 6) {
-        echo $mess[1] . ":" . $mess[2] . ":" . $mess[3] . ":" . $mess[4] . ":" . $mess[5] . ":" . $mess[6];
+        echo esc($mess[1] . ":" . $mess[2] . ":" . $mess[3] . ":" . $mess[4] . ":" . $mess[5] . ":" . $mess[6]);
       } else {
-        echo $mess[1];
+        echo esc($mess[1]);
       }
       echo "</td>";
       echo "<td>";
       if (count($mess) > 6) {
-        echo str_replace("trying to", "", $mess[7] . " " . $mess[8] . " " . $mess[9] . " " . $mess[10]);
+        echo esc(str_replace("trying to", "", $mess[7] . " " . $mess[8] . " " . $mess[9] . " " . $mess[10]));
       } else {
-        echo str_replace("trying to", "", $mess[2] . " " . $mess[3] . " " . $mess[4] . " " . $mess[5]);
+        echo esc(str_replace("trying to", "", $mess[2] . " " . $mess[3] . " " . $mess[4] . " " . $mess[5]));
       }
       echo "</td>";
     } else {

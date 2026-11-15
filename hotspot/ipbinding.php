@@ -83,10 +83,10 @@ for ($i = 0; $i < $TotalReg; $i++) {
 
 		if ($bdisabled == "true") {
 			$uriprocess = "'./?enable-ip-binding=" . $id . "&session=" . $session . "'";
-			echo "<span class='text-warning btnsmall pointer' title='Enable Binding " . $addr . "' onclick=loadpage(".$uriprocess.")><i class='fa fa-lock'></span></td>";
+			echo "<span class='text-warning btnsmall pointer' title='Enable Binding " . esc($addr) . "' onclick=loadpage(".$uriprocess.")><i class='fa fa-lock'></span></td>";
 		} else {
 			$uriprocess = "'./?disable-ip-binding=" . $id . "&session=" . $session . "'";
-			echo "<span title='Disable Binding " . $addr . "' class='btnsmall pointer' onclick=loadpage(".$uriprocess.")><i class='fa fa-unlock '></span></td>";
+			echo "<span title='Disable Binding " . esc($addr) . "' class='btnsmall pointer' onclick=loadpage(".$uriprocess.")><i class='fa fa-unlock '></span></td>";
 		}
 		echo "<td style='text-align:center;'>";
 		if ($binding['bypassed'] == "true") {
@@ -94,11 +94,11 @@ for ($i = 0; $i < $TotalReg; $i++) {
 		} else {
 		}
 		echo "</td>";
-		echo "<td>" . $commt . "</td>";
-		echo "<td>" . $maca . "</td>";
-		echo "<td>" . $addr . "</a></td>";
-		echo "<td>" . $toaddr . "</td>";
-		echo "<td>" . $server . "</td>";
+		echo "<td>" . esc($commt) . "</td>";
+		echo "<td>" . esc($maca) . "</td>";
+		echo "<td>" . esc($addr) . "</a></td>";
+		echo "<td>" . esc($toaddr) . "</td>";
+		echo "<td>" . esc($server) . "</td>";
 		echo "</tr>";
 	}
 	?>

@@ -23,7 +23,7 @@ if (!isset($_SESSION["mikhmon"])) {
   header("Location:../admin.php?id=login");
 } else {
 
-  date_default_timezone_set($_SESSION['timezone']);
+  date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
 
   $getprofile = $API->comm("/ip/hotspot/user/profile/print");
   $srvlist = $API->comm("/ip/hotspot/print");
@@ -286,7 +286,7 @@ include('./voucher/printbt.php');
     <h3><i class="fa fa-edit"></i> <?php  echo $_edit_user.' '.$uname.' '; if ($utimelimit == "1s") {  echo $_expired;}?></h3>
 </div>
 <div class="card-body">
-<form autocomplete="new-password" method="post" action="">
+<form autocomplete="new-password" method="post" action=""><?= csrf_field() ?>
   <div>
     <?php if ($_SESSION['ubp'] != "") {
       echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'><i class='fa fa-close'></i> ".$_close."</a>";

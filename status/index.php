@@ -15,12 +15,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+include_once(__DIR__ . '/../include/security.php');
 
 // hide all error
 error_reporting(0);
 ob_start("ob_gzhandler");
 
-$session = $_GET['session'];
+$session = mikhmon_session_param();
 require('../lib/routeros_api.class.php');
 include('../lib/formatbytesbites.php');
 include('../include/config.php');
@@ -28,12 +29,12 @@ include('../include/config.php');
 // theme  
 include('../include/theme.php');
 
-$iphost = explode('!', $data[$session][1])[1];
-$userhost = explode('@|@', $data[$session][2])[1];
-$passwdhost = explode('#|#', $data[$session][3])[1];
-$hotspotname = explode('%', $data[$session][4])[1];
-$dnsname = explode('^', $data[$session][5])[1];
-$currency = explode('&', $data[$session][6])[1];
+$iphost = (explode('!', $data[$session][1] ?? '')[1] ?? '');
+$userhost = (explode('@|@', $data[$session][2] ?? '')[1] ?? '');
+$passwdhost = (explode('#|#', $data[$session][3] ?? '')[1] ?? '');
+$hotspotname = (explode('%', $data[$session][4] ?? '')[1] ?? '');
+$dnsname = (explode('^', $data[$session][5] ?? '')[1] ?? '');
+$currency = (explode('&', $data[$session][6] ?? '')[1] ?? '');
 
 $cekindo['indo'] = array('RP', 'Rp', 'rp', 'IDR', 'idr', 'RP.', 'Rp.', 'rp.', 'IDR.', 'idr.', );
 
@@ -53,7 +54,7 @@ if ($currency == in_array($currency, $cekindo['indo'])) {
 <!DOCTYPE html>
 <html>
 <head>
-<title><?= $title[0] . " " . $hotspotname; ?></title>
+<title><?= esc($title[0] . " " . $hotspotname); ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta http-equiv="pragma" content="no-cache" />
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
@@ -71,7 +72,7 @@ function goBack() {
 </head>
 <body >
 <div class="login-box" style="padding-top: 10px;">
-<h3 class="text-center">Status Voucher<br><?= $hotspotname; ?></h3>
+<h3 class="text-center">Status Voucher<br><?= esc($hotspotname); ?></h3>
 <p class="text-center" id="date1"><?= $title[11] . " : " . date("d-m-Y") . "<br>"; ?></p>
 <form autocomplete="off"class="form" method="post" action="">
 	<div class="input-group">
@@ -84,8 +85,13 @@ function goBack() {
 </div>
 </form>
 <?php
-if (isset($_POST['nama'])) {
-	$name = ($_POST['nama']);
+// public page: limit lookups per client to slow down voucher-code guessing
+$statuswait = isset($_POST['nama']) ? mikhmon_rate_wait('status', 30, 300) : 0;
+if ($statuswait > 0) {
+	echo "<h3 class='text-center'>Too many requests. Try again in " . ceil($statuswait / 60) . " minute(s).</h3>";
+} elseif (isset($_POST['nama'])) {
+	mikhmon_rate_hit('status');
+	$name = mikhmon_input($_POST, 'nama');
 	if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
 		$getuser = $API->comm("/ip/hotspot/user/print", array("?name" => "$name"));
 		$user = $getuser[0]['name'];
@@ -120,9 +126,9 @@ if (isset($_POST['nama'])) {
 	}
   
 	if ($user == "" || (substr($exp,3,1) != "/" && substr($exp,6,1) != "/")) {
-		echo "<h3 class='text-center'>User <i style='color:#008CCA;'>$name</i> $title[9]</h3>";
+		echo "<h3 class='text-center'>User <i style='color:#008CCA;'>" . esc($name) . "</i> $title[9]</h3>";
 	} elseif ($limitup == "1s" || $uptime == $limitup || $getbyteo == $limitbyte) {
-		echo "<h3 class='text-center'>User <i style='color:#008CCA;'>$name</i> $title[10]</h3>";
+		echo "<h3 class='text-center'>User <i style='color:#008CCA;'>" . esc($name) . "</i> $title[10]</h3>";
 	}
 	if ($user == "" || (substr($exp,3,1) != "/" && substr($exp,6,1) != "/")) {
 	} else {
@@ -141,15 +147,15 @@ if (isset($_POST['nama'])) {
 	echo "<table class='table table-bordered table-hover text-nowrap'>";
 	echo "	<tr>";
 	echo "		<td >$title[1]</td>";
-	echo "		<td > $user</td>";
+	echo "		<td > " . esc($user) . "</td>";
 	echo "	</tr>";
 	echo "	<tr>";
 	echo "		<td >$title[2]</td>";
-	echo "		<td > $profile</td>";
+	echo "		<td > " . esc($profile) . "</td>";
 	echo "	</tr>";
 	echo "	<tr>";
 	echo "		<td >$title[3]</td>";
-	echo "		<td > $uptime</td>";
+	echo "		<td > " . esc($uptime) . "</td>";
 	echo "	</tr>";
 	echo "	<tr>";
 	echo "		<td >$title[4]</td>";
@@ -169,11 +175,11 @@ if (isset($_POST['nama'])) {
 		echo "	</tr>";
 		echo "	<tr>";
 		echo "		<td >$title[6]</td>";
-		echo "		<td >$getvalid</td>";
+		echo "		<td >" . esc($getvalid) . "</td>";
 		echo "	</tr>";
 				echo "	<tr>";
 		echo "		<td >$title[8]</td>";
-		echo "		<td >$exp</td>";
+		echo "		<td >" . esc($exp) . "</td>";
 		echo "	</tr>";
 		echo "	<tr>";
 		echo "		<td >Status</td>";

@@ -15,21 +15,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+include_once(__DIR__ . '/../include/security.php');
+mikhmon_session_cookie_params();
 session_start();
+mikhmon_guard_request();
 // hide all error
 error_reporting(0);
 if (!isset($_SESSION["mikhmon"])) {
   header("Location:../admin.php?id=login");
 } else {
 // load session MikroTik
-  $session = $_GET['session'];
+  $session = mikhmon_session_param();
 
 // load config
   include('../include/config.php');
-  $iphost = explode('!', $data[$session][1])[1];
-  $userhost = explode('@|@', $data[$session][2])[1];
-  $passwdhost = explode('#|#', $data[$session][3])[1];
-  $curency = explode('&', $data[$session][6])[1];
+  $iphost = (explode('!', $data[$session][1] ?? '')[1] ?? '');
+  $userhost = (explode('@|@', $data[$session][2] ?? '')[1] ?? '');
+  $passwdhost = (explode('#|#', $data[$session][3] ?? '')[1] ?? '');
+  $curency = (explode('&', $data[$session][6] ?? '')[1] ?? '');
 
 // lang
 include('../include/lang.php');

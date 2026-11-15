@@ -25,7 +25,7 @@ if (!isset($_SESSION["mikhmon"])) {
 	header("Location:../admin.php?id=login");
 } else {
 // time zone
-date_default_timezone_set($_SESSION['timezone']);
+date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
 
 	$genprof = $_GET['genprof'];
 	if ($genprof != "") {
@@ -97,11 +97,7 @@ date_default_timezone_set($_SESSION['timezone']);
 		$_SESSION['ubp'] = $profile;
 		$commt = $user . "-" . rand(100, 999) . "-" . date("m.d.y") . "-" . $adcomment;
 		$gentemp = $commt . "|~" . $profile . "~" . $getvalid . "~" . $getprice . "!".$getsprice."~" . $timelimit . "~" . $datalimit . "~" . $getlock;
-		$gen = '<?php $genu="'.encrypt($gentemp).'";?>';
-		$temp = './voucher/temp.php';
-		$handle = fopen($temp, 'w') or die('Cannot open file:  ' . $temp);
-		$data = $gen;
-		fwrite($handle, $data);
+		mikhmon_write_php_var('./voucher/temp.php', array('genu' => encrypt($gentemp)));
 
 		$a = array("1" => "", "", 1, 2, 2, 3, 3, 4);
 
@@ -291,7 +287,7 @@ date_default_timezone_set($_SESSION['timezone']);
 	<h3><i class="fa fa-user-plus"></i> <?= $_generate_user ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3> 
 	</div>
 	<div class="card-body">
-<form autocomplete="off" method="post" action="">
+<form autocomplete="off" method="post" action=""><?= csrf_field() ?>
 	<div>
 		<?php if ($_SESSION['ubp'] != "") {
 		echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";

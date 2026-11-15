@@ -15,7 +15,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+include_once(__DIR__ . '/../include/security.php');
+mikhmon_session_cookie_params();
 session_start();
+mikhmon_guard_request();
 // hide all error
 error_reporting(0);
 if (!isset($_SESSION["mikhmon"])) {
@@ -23,7 +26,7 @@ if (!isset($_SESSION["mikhmon"])) {
 } else {
 
 // load session MikroTik
-	$session = $_GET['session'];
+	$session = mikhmon_session_param();
 	$serveractive = $_GET['server'];
 
 // load config
@@ -67,7 +70,7 @@ if (!isset($_SESSION["mikhmon"])) {
     		<h3><i class="fa fa-wifi"></i> <?= $_hotspot_active ?> <?php
 				if ($serveractive == "") {
 				} else {
-					echo $serveractive . " ";
+					echo esc($serveractive) . " ";
 				}
 				if ($counthotspotactive < 2) {
 					echo "$counthotspotactive item";
@@ -114,17 +117,17 @@ for ($i = 0; $i < $TotalReg; $i++) {
 	$comment = $hotspotactive['comment'];
 	$uriprocess = "'./?remove-user-active=" . $id . "&session=" . $session . "'";
 	echo "<tr>";
-	echo "<td style='text-align:center;'><span class='pointer'  title='Remove " . $user . "' onclick=loadpage(".$uriprocess.")><i class='fa fa-minus-square text-danger'></i></span></td>";
-	echo "<td><a  title='filter " . $server . "' href='./?hotspot=active&server=" . $server . "&session=" . $session . "'><i class='fa fa-server'></i> " . $server . "</a></td>";
-	echo "<td><a title='Open User " . $user . "' href=./?hotspot-user=" . $user . "&session=" . $session . "><i class='fa fa-edit'></i> " . $user . "</a></td>";
-	echo "<td>" . $address . "</td>";
-	echo "<td>" . $mac . "</td>";
-	echo "<td style='text-align:right;'>" . $uptime . "</td>";
-	echo "<td style='text-align:right;'>" . $bytesi . "</td>";
-	echo "<td style='text-align:right;'>" . $byteso . "</td>";
-	echo "<td style='text-align:right;'>" . $usesstime . "</td>";
-	echo "<td>" . $loginby . "</td>";
-	echo "<td>" . $comment . "</td>";
+	echo "<td style='text-align:center;'><span class='pointer'  title='Remove \" . esc($user) . \"' onclick=loadpage(".$uriprocess.")><i class='fa fa-minus-square text-danger'></i></span></td>";
+	echo "<td><a  title='filter \" . esc($server) . \"' href='./?hotspot=active&server=" . esc(urlencode($server)) . "&session=" . $session . "'><i class='fa fa-server'></i> " . esc($server) . "</a></td>";
+	echo "<td><a title='Open User \" . esc($user) . \"' href='./?hotspot-user=" . esc(urlencode($user)) . "&session=" . $session . "'><i class='fa fa-edit'></i> " . esc($user) . "</a></td>";
+	echo "<td>" . esc($address) . "</td>";
+	echo "<td>" . esc($mac) . "</td>";
+	echo "<td style='text-align:right;'>" . esc($uptime) . "</td>";
+	echo "<td style='text-align:right;'>" . esc($bytesi) . "</td>";
+	echo "<td style='text-align:right;'>" . esc($byteso) . "</td>";
+	echo "<td style='text-align:right;'>" . esc($usesstime) . "</td>";
+	echo "<td>" . esc($loginby) . "</td>";
+	echo "<td>" . esc($comment) . "</td>";
 	echo "</tr>";
 }
 ?>

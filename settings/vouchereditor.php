@@ -23,7 +23,7 @@ if (!isset($_SESSION["mikhmon"])) {
 	header("Location:../admin.php?id=login");
 } else {
 // load session MikroTik
-	$session = $_GET['session'];
+	$session = mikhmon_session_param();
 
 // load config
 include('../include/config.php');
@@ -46,13 +46,13 @@ if ($telplate == "default" || $telplate == "rdefault") {
 	$popup = "javascript:window.open('./voucher/vpreview.php?usermode=up&small=yes&qr=no&session=" . $session . "','_blank','width=310,height=310')";
 	$popupQR = "javascript:window.open('./voucher/vpreview.php?usermode=up&small=yes&qr=yes&session=" . $session . "','_blank','width=310,height=310')";
 }
-if (isset($_POST['save'])) {
+if (isset($_POST['save']) && in_array($telplatet, array('template', 'template-thermal', 'template-small'), true)) {
+	// Templates are PHP by design (admin-only, CSRF-protected); only the three known files can be written.
 	$template = './voucher/' . $telplatet . '.php';
-	$handle = fopen($template, 'w') or die('Cannot open file:  ' . $template);
-
-	$data = ($_POST['editor']);
-
-	fwrite($handle, $data);
+	$tplsource = mikhmon_input($_POST, 'editor');
+	if (file_put_contents($template, $tplsource, LOCK_EX) !== false && function_exists('opcache_invalidate')) {
+		@opcache_invalidate($template, true);
+	}
 		
 		//header("Location:$url");
 }
@@ -82,7 +82,7 @@ textarea{
 						<h3><i class="fa fa-edit"></i> <?= $_template_editor ?></h3>
 					</div>
 			<div class="card-body">
-				<form autocomplete="off" method="post" action="">
+				<form autocomplete="off" method="post" action=""><?= csrf_field() ?>
 					<table class="table">
 						<tr>
 							<td>

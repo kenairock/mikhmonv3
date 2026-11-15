@@ -1,4 +1,5 @@
 <?php
+include_once __DIR__ . '/../include/security.php';
 /*****************************
  *
  * RouterOS PHP API class v1.6
@@ -280,6 +281,10 @@ class RouterosAPI
      */
     public function read($parse = true)
     {
+        // PHP 8: fread() on a failed connection is a TypeError; treat it as "no data"
+        if (!is_resource($this->socket)) {
+            return array();
+        }
         $RESPONSE     = array();
         $receiveddone = false;
         while (true) {
@@ -367,6 +372,10 @@ class RouterosAPI
      */
     public function write($command, $param2 = true)
     {
+        // PHP 8: fwrite() on a failed connection is a TypeError
+        if (!is_resource($this->socket)) {
+            return false;
+        }
         if ($command) {
             $data = explode("\n", $command);
             foreach ($data as $com) {
@@ -399,6 +408,10 @@ class RouterosAPI
      */
     public function comm($com, $arr = array())
     {
+        // not connected (router unreachable / wrong credentials): return an empty result
+        if (!is_resource($this->socket)) {
+            return array();
+        }
         $count = count($arr);
         $this->write($com, !$arr);
         $i = 0;
@@ -435,28 +448,13 @@ class RouterosAPI
     }
 }
 
-// encrypt decript
+// encrypt / decrypt: AES-256-GCM via include/security.php (old values still readable)
 
 function encrypt($string, $key=128) {
-	$result = '';
-	for($i=0, $k= strlen($string); $i<$k; $i++) {
-		$char = substr($string, $i, 1);
-		$keychar = substr($key, ($i % strlen($key))-1, 1);
-		$char = chr(ord($char)+ord($keychar));
-		$result .= $char;
-	}
-	return base64_encode($result);
+	return mikhmon_encrypt($string);
 }
 function decrypt($string, $key=128) {
-	$result = '';
-	$string = base64_decode($string);
-	for($i=0, $k=strlen($string); $i< $k ; $i++) {
-		$char = substr($string, $i, 1);
-		$keychar = substr($key, ($i % strlen($key))-1, 1);
-		$char = chr(ord($char)-ord($keychar));
-		$result .= $char;
-	}
-	return $result;
+	return mikhmon_decrypt($string);
 }
 
 // Reformat date time MikroTik

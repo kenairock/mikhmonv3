@@ -90,13 +90,13 @@ for ($i = 0; $i < $TotalReg; $i++) {
 		echo "<b title='S - static'>S</b>";
 	}
 	echo "</td>";
-	echo "<td>" . $addr . "</td>";
-	echo "<td>" . $maca . "</td>";
-	echo "<td>" . $server . "</td>";
-	echo "<td>" . $aaddr . "</a></td>";
-	echo "<td>" . $amaca . "</td>";
-	echo "<td>" . $ahostname . "</td>";
-	echo "<td>" . $status . "</td>";
+	echo "<td>" . esc($addr) . "</td>";
+	echo "<td>" . esc($maca) . "</td>";
+	echo "<td>" . esc($server) . "</td>";
+	echo "<td>" . esc($aaddr) . "</a></td>";
+	echo "<td>" . esc($amaca) . "</td>";
+	echo "<td>" . esc($ahostname) . "</td>";
+	echo "<td>" . esc($status) . "</td>";
 	echo "</tr>";
 }
 ?>

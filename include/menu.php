@@ -181,13 +181,16 @@ if($idleto != "disable"){
 </div>
  <div class="navbar-right">
   <a id="logout" href="./admin.php?id=logout" ><i class="fa fa-sign-out mr-1"></i> <?= $_logout ?></a>
+  <?php if (mikhmon_can('admin')) { ?>
   <select class="stheme ses text-right mr-t-10 pd-5">
     <option> <?= $_theme?></option>
     <?php for ($i = 0; $i < count($mtheme); $i++) {
-      echo '<option value="'.$url.'&set-theme='.$mtheme[$i],'">'.ucfirst($mtheme[$i]),'</option>';
+      echo '<option value="'.esc($url).'&set-theme='.$mtheme[$i],'">'.ucfirst($mtheme[$i]),'</option>';
     }
     ?>
   </select>
+  <?php } ?>
+  <?php if (mikhmon_can('admin')) { ?>
   <select class="slang ses text-right mr-t-10 pd-5">
     <option> <?= $language ?></option>
     <?php 
@@ -196,12 +199,13 @@ if($idleto != "disable"){
         if(is_file($filename)){
           $filename = substr(explode("/",$filename)[1],0,-4);
           if($filename == "isocodelang"){}else{
-            echo '<option value="'.$url.'&setlang=' . $filename . '">'. $isocodelang[$filename]. '</option>'; 
+            echo '<option value="'.esc($url).'&setlang=' . $filename . '">'. $isocodelang[$filename]. '</option>'; 
          }   
         }
       }
     ?>
   </select>
+  <?php } ?>
   <a title="Idle Timeout" style="<?= $didleto; ?>"><span style="width:70px;" class="pd-5 radius-3"><i class="fa fa-clock-o mr-1"></i>  <span class="mr-1" id="timer"></span></span></a>
 </div>
 </div>
@@ -212,14 +216,19 @@ if($idleto != "disable"){
 ?>  
   <div class="menu text-center align-middle card-header" style="border-radius:0;"><h3 id="MikhmonSession"><?= $session; ?></h3></div>
   <a class="connect menu <?= $shome; ?>" id="<?= $session; ?>&c=settings"><i class='fa fa-tachometer'></i> <?= $_dashboard ?></a>
-  <a  href="./admin.php?id=settings&session=<?= $session; ?>" class="menu <?= $ssettings; ?>" title="Mikhmon Settings"><i class='fa fa-gear'></i> <?= $_session_settings ?></a>
-  <a href="./admin.php?id=uplogo&session=<?= $session; ?>" class="menu <?= $suplogo; ?>"><i class="fa fa-upload "></i> <?= $_upload_logo ?></a>
-  <a href="./admin.php?id=editor&template=default&session=<?= $session; ?>" class="menu <?= $seditor; ?>"><i class="fa fa-edit"></i> <?= $_template_editor ?></a>
+  <?php if (mikhmon_can('admin')) { ?> <a  href="./admin.php?id=settings&session=<?= $session; ?>" class="menu <?= $ssettings; ?>" title="Mikhmon Settings"><i class='fa fa-gear'></i> <?= $_session_settings ?></a> <?php } ?>
+  <?php if (mikhmon_can('admin')) { ?> <a href="./admin.php?id=uplogo&session=<?= $session; ?>" class="menu <?= $suplogo; ?>"><i class="fa fa-upload "></i> <?= $_upload_logo ?></a> <?php } ?>
+  <?php if (mikhmon_can('admin')) { ?> <a href="./admin.php?id=editor&template=default&session=<?= $session; ?>" class="menu <?= $seditor; ?>"><i class="fa fa-edit"></i> <?= $_template_editor ?></a> <?php } ?>
   <div class="menu spa"></div>
 <?php 
 } ?>  
   <a href="./admin.php?id=sessions" class="menu <?= $ssesslist; ?>"><i class="fa fa-gear"></i> <?= $_admin_settings ?></a>
-  <a href="./admin.php?id=settings&router=new-<?= rand(1111,9999) ?>" class="menu <?= $snsettings ?>"><i class="fa fa-plus"></i> <?= $_add_router ?></a>
+  <a href="./admin.php?id=account" class="menu <?= ($id == "account") ? "active" : ""; ?>"><i class="fa fa-key"></i> My account</a>
+  <?php if (mikhmon_can('admin')) { ?>
+  <a href="./admin.php?id=accounts" class="menu <?= ($id == "accounts") ? "active" : ""; ?>"><i class="fa fa-users"></i> Accounts</a>
+  <a href="./admin.php?id=audit" class="menu <?= ($id == "audit") ? "active" : ""; ?>"><i class="fa fa-history"></i> Login &amp; audit history</a>
+  <?php } ?>
+  <?php if (mikhmon_can('admin')) { ?> <a href="./admin.php?id=settings&router=new-<?= rand(1111,9999) ?>" class="menu <?= $snsettings ?>"><i class="fa fa-plus"></i> <?= $_add_router ?></a> <?php } ?>
   <a href="./admin.php?id=about" class="menu <?= $sabout; ?>"><i class="fa fa-info-circle"></i> <?= $_about ?></a>
 
 </div>
@@ -256,19 +265,21 @@ include('./info.php');
 </div>
  <div class="navbar-right">
   <a id="logout" href="./?hotspot=logout&session=<?= $session; ?>" ><i class="fa fa-sign-out mr-1"></i> <?= $_logout ?></a>
+  <?php if (mikhmon_can('admin')) { ?>
   <select class="stheme ses text-right mr-t-10 pd-5">
     <option> <?= $_theme ?></option>
     <?php for ($i = 0; $i < count($mtheme); $i++) {
-      echo '<option value="'.$url.'&set-theme='.$mtheme[$i],'">'.ucfirst($mtheme[$i]),'</option>';
+      echo '<option value="'.esc($url).'&set-theme='.$mtheme[$i],'">'.ucfirst($mtheme[$i]),'</option>';
     }
     ?>
   </select>
+  <?php } ?>
   <select class="connect optfa ses text-right mr-t-10 pd-5">
-    <option id="MikhmonSession" value="<?= $session; ?>"><?= $hotspotname; ?></option>
+    <option id="MikhmonSession" value="<?= esc($session); ?>"><?= esc($hotspotname); ?></option>
       <?php
-      foreach (file('./include/config.php') as $line) {
-        $sesname = explode("'", $line)[1];
-        if ($sesname == "" || $sesname== "mikhmon") {
+      foreach (array_keys($data) as $sesname) {
+        $sesname = (string)$sesname;
+        if ($sesname == "" || $sesname== "mikhmon" || !mikhmon_valid_session_name($sesname)) {
         } else {
         if($sesname == $session){
           echo '<option value="' . $sesname. '">'.$sesname. ' &#x2666;</option>';
@@ -298,8 +309,8 @@ include('./info.php');
   </div>
   <div class="dropdown-container <?= $umenu; ?>">
     <a href="./?hotspot=users&profile=all&session=<?= $session; ?>" class="<?= $susersl; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-list "></i> <?= $_user_list ?> </a>
-    <a href="./?hotspot-user=add&session=<?= $session; ?>" class="<?= $sadduser; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-user-plus "></i> <?= $_add_user ?> </a>
-    <a href="./?hotspot-user=generate&session=<?= $session; ?>" class="<?= $sgenuser; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-user-plus"></i> <?= $_generate ?> </a>        
+    <?php if (mikhmon_can('operator')) { ?> <a href="./?hotspot-user=add&session=<?= $session; ?>" class="<?= $sadduser; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-user-plus "></i> <?= $_add_user ?> </a> <?php } ?>
+    <?php if (mikhmon_can('operator')) { ?> <a href="./?hotspot-user=generate&session=<?= $session; ?>" class="<?= $sgenuser; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-user-plus"></i> <?= $_generate ?> </a>         <?php } ?>
   </div>
   <!--profile-->
   <div class="dropdown-btn <?= $suserprof; ?>"><i class=" fa fa-pie-chart"></i>  <?= $_user_profile ?>
@@ -307,7 +318,7 @@ include('./info.php');
   </div>
   <div class="dropdown-container <?= $upmenu; ?>">
     <a href="./?hotspot=user-profiles&session=<?= $session; ?>" class=" <?= $suserprofiles; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-list "></i> <?= $_user_profile_list ?> </a>
-    <a href="./?user-profile=add&session=<?= $session; ?>" class=" <?= $sadduserprof; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square "></i> <?= $_add_user_profile ?> </a>
+    <?php if (mikhmon_can('operator')) { ?> <a href="./?user-profile=add&session=<?= $session; ?>" class=" <?= $sadduserprof; ?>"> &nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square "></i> <?= $_add_user_profile ?> </a> <?php } ?>
 
   </div>
   <!--active-->
@@ -320,7 +331,7 @@ include('./info.php');
    <a href="./?hotspot=cookies&session=<?= $session; ?>" class="menu <?= $scookies; ?>"><i class=" fa fa-hourglass"></i> <?= $_hotspot_cookies ?></a>
   </div>
   <!--quick print-->
-  <a href="./?hotspot=quick-print&session=<?= $session; ?>" class="menu <?= $squick; ?>"> <i class="fa fa-print"></i> <?= $_quick_print ?> </a>
+  <?php if (mikhmon_can('operator')) { ?> <a href="./?hotspot=quick-print&session=<?= $session; ?>" class="menu <?= $squick; ?>"> <i class="fa fa-print"></i> <?= $_quick_print ?> </a> <?php } ?>
   <!--vouchers-->
   <a href="./?hotspot=users-by-profile&session=<?= $session; ?>" class="menu <?= $susersbp; ?>"> <i class="fa fa-ticket"></i> <?= $_vouchers ?> </a>
    <!--log-->
@@ -337,8 +348,8 @@ include('./info.php');
   </div>
   <div class="dropdown-container <?= $schmenu; ?>">
     <a href="./?system=scheduler&session=<?= $session; ?>" class="<?= $ssch; ?>"> <i class="fa fa-clock-o "></i> <?= $_system_scheduler ?> </a>
-    <a href="./admin.php?id=reboot&session=<?= $session; ?>" class=""> <i class="fa fa-power-off "></i> <?= $_system_reboot ?> </a>            
-    <a href="./admin.php?id=shutdown&session=<?= $session; ?>" class=""> <i class="fa fa-power-off "></i> <?= $_system_off ?> </a> 
+    <?php if (mikhmon_can('admin')) { ?> <a href="./admin.php?id=reboot&session=<?= $session; ?>" class=""> <i class="fa fa-power-off "></i> <?= $_system_reboot ?> </a>             <?php } ?>
+    <?php if (mikhmon_can('admin')) { ?> <a href="./admin.php?id=shutdown&session=<?= $session; ?>" class=""> <i class="fa fa-power-off "></i> <?= $_system_off ?> </a>  <?php } ?>
   </div>
   <!--dhcp leases-->
   <a href="./?hotspot=dhcp-leases&session=<?= $session; ?>" class="menu <?= $slease; ?>"><i class=" fa fa-sitemap"></i> <?= $_dhcp_leases ?></a>
@@ -351,10 +362,15 @@ include('./info.php');
     <i class="fa fa-caret-down"></i> &nbsp;
   </div>
   <div class="dropdown-container <?= $settmenu; ?>">
-  <a href="./admin.php?id=settings&session=<?= $session; ?>" class="menu "> <i class="fa fa-gear "></i> <?= $_session_settings ?> </a>
+  <?php if (mikhmon_can('admin')) { ?> <a href="./admin.php?id=settings&session=<?= $session; ?>" class="menu "> <i class="fa fa-gear "></i> <?= $_session_settings ?> </a> <?php } ?>
   <a href="./admin.php?id=sessions" class="menu "> <i class="fa fa-gear "></i> <?= $_admin_settings ?> </a>
-  <a href="./?hotspot=uplogo&session=<?= $session; ?>" class="menu <?= $uplogo; ?>"> <i class="fa fa-upload "></i> <?= $_upload_logo ?> </a>
-  <a href="./?hotspot=template-editor&template=default&session=<?= $session; ?>" class="menu <?= $teditor; ?>"> <i class="fa fa-edit "></i> <?= $_template_editor ?> </a>          
+  <a href="./admin.php?id=account" class="menu <?= ($id == "account") ? "active" : ""; ?>"><i class="fa fa-key"></i> My account</a>
+  <?php if (mikhmon_can('admin')) { ?>
+  <a href="./admin.php?id=accounts" class="menu <?= ($id == "accounts") ? "active" : ""; ?>"><i class="fa fa-users"></i> Accounts</a>
+  <a href="./admin.php?id=audit" class="menu <?= ($id == "audit") ? "active" : ""; ?>"><i class="fa fa-history"></i> Login &amp; audit history</a>
+  <?php } ?>
+  <?php if (mikhmon_can('admin')) { ?> <a href="./?hotspot=uplogo&session=<?= $session; ?>" class="menu <?= $uplogo; ?>"> <i class="fa fa-upload "></i> <?= $_upload_logo ?> </a> <?php } ?>
+  <?php if (mikhmon_can('admin')) { ?> <a href="./?hotspot=template-editor&template=default&session=<?= $session; ?>" class="menu <?= $teditor; ?>"> <i class="fa fa-edit "></i> <?= $_template_editor ?> </a>           <?php } ?>
   </div>
   <!--about-->
   <a href="./?hotspot=about&session=<?= $session; ?>" class="menu <?= $sabout; ?>"><i class="fa fa-info-circle"></i> <?= $_about ?></a>

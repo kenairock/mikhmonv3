@@ -15,9 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+include_once('./include/security.php');
+mikhmon_session_cookie_params();
 session_start();
 // hide all error
 error_reporting(0);
+mikhmon_guard_request();
 
 ob_start("ob_gzhandler");
 
@@ -25,7 +28,7 @@ ob_start("ob_gzhandler");
 $url = $_SERVER['REQUEST_URI'];
 
 // load session MikroTik
-$session = $_GET['session'];
+$session = mikhmon_session_param();
 $id = $_GET['id'];
 $c = $_GET['c'];
 $router = $_GET['router'];
@@ -71,15 +74,32 @@ include_once('./lib/formatbytesbites.php');
 if ($id == "login" || substr($url, -1) == "p") {
 
   if (isset($_POST['login'])) {
-    $user = $_POST['user'];
-    $pass = $_POST['pass'];
-    if ($user == $useradm && $pass == decrypt($passadm)) {
-      $_SESSION["mikhmon"] = $user;
+    $user = mikhmon_input($_POST, 'user');
+    $pass = mikhmon_input($_POST, 'pass');
+    // 5 failed attempts per IP within 15 minutes, then locked for the rest of the window
+    $wait = mikhmon_rate_wait('login', 5, 900);
+    $auth = ($wait > 0) ? null : mikhmon_authenticate($user, $pass, $useradm, $passadm);
+    if ($wait > 0) {
+      mikhmon_log_login($user, false, 'rate limited');
+      $error = '<div style="width: 100%; padding:5px 0px 5px 0px; border-radius:5px;" class="bg-danger"><i class="fa fa-ban"></i> Alert!<br>Too many failed logins. Try again in ' . ceil($wait / 60) . ' minute(s).</div>';
+    } elseif ($auth['ok']) {
+      mikhmon_rate_clear('login');
+      mikhmon_start_user_session($auth['user']);
+      mikhmon_log_login($auth['user']['username'], true);
+      mikhmon_audit('login', $auth['user']['username'], 'role=' . $auth['user']['role']);
+      // the database bootstrap may have rewritten config.php: reload before saving it again
+      $data = mikhmon_load_config_data();
+      // re-encrypt router passwords stored in the old format (and, without SQLite, hash the admin password)
+      mikhmon_upgrade_stored_secrets($data, $pass, !empty($auth['user']['legacy_upgrade']));
 
         echo "<script>window.location='./admin.php?id=sessions'</script>";
-    
+
     } else {
-      $error = '<div style="width: 100%; padding:5px 0px 5px 0px; border-radius:5px;" class="bg-danger"><i class="fa fa-ban"></i> Alert!<br>Invalid username or password.</div>';
+      mikhmon_rate_hit('login');
+      mikhmon_log_login($user, false, $auth['reason']);
+      usleep(random_int(300000, 700000));
+      $error = '<div style="width: 100%; padding:5px 0px 5px 0px; border-radius:5px;" class="bg-danger"><i class="fa fa-ban"></i> Alert!<br>'
+        . ($auth['reason'] === 'database unavailable' ? 'Account database unavailable. Check that pdo_sqlite is enabled.' : 'Invalid username or password.') . '</div>';
     }
   }
   
@@ -144,20 +164,25 @@ if ($id == "login" || substr($url, -1) == "p") {
   include_once('./process/shutdown.php');
 } elseif ($id == "remove-session" && $session != "") {
   include_once('./include/menu.php');
-  $fc = file("./include/config.php" );
-  $f = fopen("./include/config.php", "w");
-  $q = "'";
-  $rem = '$data['.$q.$session.$q.']';
-  foreach ($fc as $line) {
-    if (!strstr($line, $rem))
-      fputs($f, $line);
+  if ($session !== "mikhmon" && isset($data[$session])) {
+    unset($data[$session]);
+    mikhmon_save_config($data);
   }
-  fclose($f);
   echo "<script>window.location='./admin.php?id=sessions'</script>";
 } elseif ($id == "about") {
   include_once('./include/menu.php');
   include_once('./include/about.php');
+} elseif ($id == "accounts") {
+  include_once('./include/menu.php');
+  include_once('./settings/accounts.php');
+} elseif ($id == "account") {
+  include_once('./include/menu.php');
+  include_once('./settings/account.php');
+} elseif ($id == "audit") {
+  include_once('./include/menu.php');
+  include_once('./settings/audit.php');
 } elseif ($id == "logout") {
+  mikhmon_audit('logout', isset($_SESSION['mikhmon']) ? $_SESSION['mikhmon'] : '');
   include_once('./include/menu.php');
   echo "<b class='cl-w'><i class='fa fa-circle-o-notch fa-spin' style='font-size:24px'></i> Logout...</b>";
   session_destroy();
@@ -165,8 +190,10 @@ if ($id == "login" || substr($url, -1) == "p") {
 } elseif ($id == "remove-logo" && $logo != ""  && !empty($session)) {
   include_once('./include/menu.php');
   $logopath = "./img/";
-  $remlogo = $logopath . $logo;
-  unlink("$remlogo");
+  $logoname = basename((string)$logo);
+  if ($logoname === $logo && preg_match('/^logo-[A-Za-z0-9._-]+\.png$/', $logoname) && is_file($logopath . $logoname)) {
+    unlink($logopath . $logoname);
+  }
   echo "<script>window.location='./admin.php?id=uplogo&session=" . $session . "'</script>";
 } elseif ($id == "editor"  && !empty($session)) {
   include_once('./include/menu.php');

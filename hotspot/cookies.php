@@ -75,11 +75,11 @@ for ($i = 0; $i < $TotalReg; $i++) {
 	$uriprocess = "'./?remove-cookie=" . $id . "&session=" . $session . "'";
 
 	echo "<tr>";
-	echo "<td style='text-align:center;'><span class='pointer'  title='Remove " . $user . "' onclick=loadpage(".$uriprocess.")><i class='fa fa-minus-square text-danger'></i></span></td>";
-	echo "<td>" . $user . "</td>";
-	echo "<td>" . $maca . "</td>";
-	echo "<td>" . $domain . "</td>";
-	echo "<td>" . $exp . "</a></td>";
+	echo "<td style='text-align:center;'><span class='pointer'  title='Remove \" . esc($user) . \"' onclick=loadpage(".$uriprocess.")><i class='fa fa-minus-square text-danger'></i></span></td>";
+	echo "<td>" . esc($user) . "</td>";
+	echo "<td>" . esc($maca) . "</td>";
+	echo "<td>" . esc($domain) . "</td>";
+	echo "<td>" . esc($exp) . "</a></td>";
 	echo "</tr>";
 }
 ?>

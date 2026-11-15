@@ -33,7 +33,7 @@ session_start();
       <span style="font-size: 25px; margin: 10px;">MIKHMON</span>
       </div>
       <center>
-      <form autocomplete="off" action="" method="post">
+      <form autocomplete="off" action="" method="post"><?= csrf_field() ?>
       <table class="table" style="width:90%">
         <tr>
           <td class="align-middle text-center">

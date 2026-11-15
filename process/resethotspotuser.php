@@ -18,6 +18,8 @@
 session_start();
 // hide all error
 error_reporting(0);
+// only runs when included by index.php (authenticated, $API connected)
+if (!isset($_SESSION["mikhmon"]) || !isset($API)) { header("Location:../admin.php?id=login"); exit; } // mikhmon_process_guard
 
 $API->comm("/ip/hotspot/user/set", array(
 	".id" => "$resethotspotuser", "limit-uptime" => "0", "comment" => ""

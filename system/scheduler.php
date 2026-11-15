@@ -86,18 +86,18 @@ for ($i = 0; $i < $TotalReg; $i++) {
 
 		if ($disabled == "true") {
 			$uriprocess = "'./?enable-scheduler=" . $id . "&session=" . $session . "'";
-			echo "<span class='text-warning pointer' title='Enable Scheduler " . $name . "'  onclick=loadpage(".$uriprocess.")><i class='fa fa-lock '></i></span></td>";
+			echo "<span class='text-warning pointer' title='Enable Scheduler " . esc($name) . "'  onclick=loadpage(".$uriprocess.")><i class='fa fa-lock '></i></span></td>";
 		} else {
 			$uriprocess = "'./?disable-scheduler=" . $id . "&session=" . $session . "'";
-			echo "<span  class='pointer' title='Disable Scheduler " . $name . "'  onclick=loadpage(".$uriprocess.")><i class='fa fa-unlock '></i></span></td>";
+			echo "<span  class='pointer' title='Disable Scheduler " . esc($name) . "'  onclick=loadpage(".$uriprocess.")><i class='fa fa-unlock '></i></span></td>";
 		}
-		echo "<td>" . $name . "</td>";
-		echo "<td>" . $startd . "</td>";
-		echo "<td>" . $startt . "</td>";
-		echo "<td>" . $interval . "</td>";
-		echo "<td>" . $nextrun . "</a></td>";
-		echo "<td>" . $runcount . "</a></td>";
-		echo "<td>" . $comment . "</a></td>";
+		echo "<td>" . esc($name) . "</td>";
+		echo "<td>" . esc($startd) . "</td>";
+		echo "<td>" . esc($startt) . "</td>";
+		echo "<td>" . esc($interval) . "</td>";
+		echo "<td>" . esc($nextrun) . "</a></td>";
+		echo "<td>" . esc($runcount) . "</a></td>";
+		echo "<td>" . esc($comment) . "</a></td>";
 		echo "</tr>";
 	}
 	?>

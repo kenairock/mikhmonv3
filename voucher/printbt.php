@@ -1,4 +1,4 @@
-<?php date_default_timezone_set($_SESSION['timezone']); ?>
+<?php date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get()); ?>
 <script>
 function sendToQuickPrinterChrome(){
  

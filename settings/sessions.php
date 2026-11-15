@@ -27,27 +27,22 @@ if (!isset($_SESSION["mikhmon"])) {
 
   if (isset($_POST['save'])) {
 
-    $suseradm = ($_POST['useradm']);
-    $spassadm = encrypt($_POST['passadm']);
-    $logobt = ($_POST['logobt']);
-    $qrbt = ($_POST['qrbt']);
+    $suseradm = mikhmon_input($_POST, 'useradm');
+    $spassadmplain = mikhmon_input($_POST, 'passadm');
+    $qrbt = (mikhmon_input($_POST, 'qrbt') === 'enable') ? 'enable' : 'disable';
 
-    $cari = array('1' => "mikhmon<|<$useradm", "mikhmon>|>$passadm");
-    $ganti = array('1' => "mikhmon<|<$suseradm", "mikhmon>|>$spassadm");
-
-    for ($i = 1; $i < 3; $i++) {
-      $file = file("./include/config.php");
-      $content = file_get_contents("./include/config.php");
-      $newcontent = str_replace((string)$cari[$i], (string)$ganti[$i], "$content");
-      file_put_contents("./include/config.php", "$newcontent");
+    // with the account database, logins are managed on the Accounts page;
+    // the config.php admin login is only used when SQLite is unavailable
+    // (empty password field = keep the current password)
+    if (mikhmon_db() === null && $suseradm !== "") {
+      $newpass = ($spassadmplain !== "") ? password_hash($spassadmplain, PASSWORD_DEFAULT) : $passadm;
+      if ($newpass !== "") {
+        $data['mikhmon'] = array(1 => "mikhmon<|<" . $suseradm, "mikhmon>|>" . $newpass);
+        mikhmon_save_config($data);
+      }
     }
 
-  
-  $gen = '<?php $qrbt="' . $qrbt . '";?>';
-          $key = './include/quickbt.php';
-          $handle = fopen($key, 'w') or die('Cannot open file:  ' . $key);
-          $data = $gen;
-          fwrite($handle, $data);
+    mikhmon_write_php_var('./include/quickbt.php', array('qrbt' => $qrbt));
     echo "<script>window.location='./admin.php?id=sessions'</script>";
   }
 
@@ -79,9 +74,9 @@ if (!isset($_SESSION["mikhmon"])) {
             <div class="card-body">
             <div class="row">
               <?php
-              foreach (file('./include/config.php') as $line) {
-                $value = explode("'", $line)[1];
-                if ($value == "" || $value == "mikhmon") {
+              foreach (array_keys($data) as $value) {
+                $value = (string)$value;
+                if ($value == "" || $value == "mikhmon" || !mikhmon_valid_session_name($value)) {
                 } else { ?>
                     <div class="col-12">
                         <div class="box bmh-75 box-bordered <?= $color[rand(1, 11)]; ?>">
@@ -95,12 +90,14 @@ if (!isset($_SESSION["mikhmon"])) {
                                 
                                   <div class="box-group-area">
                                     <span>
-                                      <?= $_hotspot_name ?> : <?= explode('%', $data[$value][4])[1]; ?><br>
+                                      <?= $_hotspot_name ?> : <?= esc(explode('%', $data[$value][4])[1]); ?><br>
                                       <?= $_session_name ?> : <?= $value; ?><br>
                                       <span class="connect pointer"  id="<?= $value; ?>"><i class="fa fa-external-link"></i> <?= $_open ?></span>&nbsp;
+                                      <?php if (mikhmon_can('admin')) { ?>
                                       <a href="./admin.php?id=settings&session=<?= $value; ?>"><i class="fa fa-edit"></i> <?= $_edit ?></a>&nbsp;
                                       <a href="javascript:void(0)" onclick="if(confirm('Are you sure to delete data <?= $value;
-                                      echo " (" . explode('%', $data[$value][4])[1] . ")"; ?>?')){loadpage('./admin.php?id=remove-session&session=<?= $value; ?>')}else{}"><i class="fa fa-remove"></i> <?= $_delete ?></a>
+                                      echo esc(" (" . str_replace(array("'", "\\"), "", explode('%', $data[$value][4])[1]) . ")"); ?>?')){loadpage('./admin.php?id=remove-session&session=<?= $value; ?>')}else{}"><i class="fa fa-remove"></i> <?= $_delete ?></a>
+                                      <?php } ?>
                                     </span>
 
                                   </div>
@@ -117,22 +114,48 @@ if (!isset($_SESSION["mikhmon"])) {
           </div>
         </div>
 			    <div class="col-6">
+          <?php
+          $acctdb = mikhmon_db() !== null;
+          $acctme = ($acctdb && !empty($_SESSION['mikhmon_uid'])) ? mikhmon_user_by_id($_SESSION['mikhmon_uid']) : null;
+          $acctignored = false;
+          $acctdefault = $acctdb
+            ? ($acctme && strtolower($acctme['username']) === 'mikhmon' && mikhmon_password_matches('1234', $acctme['password_hash'], $acctignored))
+            : mikhmon_is_default_admin($useradm, $passadm);
+          ?>
           <form autocomplete="off" method="post" action="">
+          <?= csrf_field() ?>
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-user-circle"></i> <?= $_admin ?></h3>
+                <h3 class="card-title"><i class="fa fa-user-circle"></i> <?= $_admin ?> &nbsp; <small><?= esc($_SESSION['mikhmon']) ?> (<?= esc(mikhmon_current_role()) ?>)</small></h3>
+                <?php if ($acctdefault) { ?>
+                <div class="bg-danger" style="padding:5px; border-radius:5px; margin-top:5px;"><i class="fa fa-warning"></i> Default login mikhmon / 1234 is in use. Change it before exposing Mikhmon to other users.</div>
+                <?php } ?>
               </div>
             <div class="card-body">
       <table class="table table-sm">
+        <?php if ($acctdb) { ?>
         <tr>
-          <td class="align-middle"><?= $_user_name ?> </td><td><input class="form-control" id="useradm" type="text" size="10" name="useradm" title="User Admin" value="<?= $useradm; ?>" required="1"/></td>
+          <td colspan="2">
+            <a href="./admin.php?id=account"><i class="fa fa-key"></i> My account / change password</a>
+            <?php if (mikhmon_can('admin')) { ?>
+            &nbsp; | &nbsp;<a href="./admin.php?id=accounts"><i class="fa fa-users"></i> Accounts</a>
+            &nbsp; | &nbsp;<a href="./admin.php?id=audit"><i class="fa fa-history"></i> Login &amp; audit history</a>
+            <?php } ?>
+          </td>
+        </tr>
+        <?php } elseif (mikhmon_can('admin')) { ?>
+        <tr>
+          <td colspan="2"><span class="text-red"><i class="fa fa-warning"></i> Account database unavailable (enable pdo_sqlite): single admin login below.</span></td>
+        </tr>
+        <tr>
+          <td class="align-middle"><?= $_user_name ?> </td><td><input class="form-control" id="useradm" type="text" size="10" name="useradm" title="User Admin" value="<?= esc($useradm); ?>" required="1"/></td>
         </tr>
         <tr>
           <td class="align-middle"><?= $_password ?> </td>
           <td>
           <div class="input-group">
           <div class="input-group-11 col-box-10">
-                <input class="group-item group-item-l" id="passadm" type="password" size="10" name="passadm" title="Password Admin" value="<?= decrypt($passadm); ?>" required="1"/>
+                <input class="group-item group-item-l" id="passadm" type="password" size="10" name="passadm" title="Password Admin" value="" placeholder="(unchanged)" autocomplete="new-password"/>
               </div>
                 <div class="input-group-1 col-box-2">
                   <div class="group-item group-item-r pd-2p5 text-center align-middle">
@@ -142,11 +165,13 @@ if (!isset($_SESSION["mikhmon"])) {
             </div>
           </td>
         </tr>
+        <?php } ?>
+        <?php if (mikhmon_can('admin')) { ?>
         <tr>
           <td class="align-middle"><?= $_quick_print ?> QR</td>
           <td>
             <select class="form-control" name="qrbt">
-            <option><?= $qrbt ?></option>
+            <option><?= esc($qrbt) ?></option>
               <option>enable</option>
               <option>disable</option>
             </select>
@@ -163,7 +188,7 @@ if (!isset($_SESSION["mikhmon"])) {
                 </div>
           </td>
         </tr>
-        
+        <?php } ?>
       </table>
       <div id="loadV">v<?= $_SESSION['v']; ?> </div>
       <div><b id="newVer" class="text-green"></b></div>

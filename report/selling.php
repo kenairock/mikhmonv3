@@ -250,7 +250,7 @@ $(document).ready(function(){
         			<?php
 										$day = explode("/", $idhr)[1];
 										if ($day != "") {
-											echo "<option value='" . $day . "'>" . $day . "</option>";
+											echo "<option value='" . esc($day) . "'>" . esc($day) . "</option>";
 										}
 										echo "<option value=''>Day</option>";
 
@@ -260,7 +260,7 @@ $(document).ready(function(){
 											} else {
 												$x = $x;
 											}
-											echo "<option value='" . $x . "'>" . $x . "</option>";
+											echo "<option value='" . esc($x) . "'>" . esc($x) . "</option>";
 										}
 										?>
     		</select>
@@ -275,15 +275,15 @@ $(document).ready(function(){
 
 										if ($month != "") {
 											$fm = array_search($month, $idbls);
-											echo "<option value='" . $month . "'>" . $idblf[$fm] . "</option>";
+											echo "<option value='" . esc($month) . "'>" . esc($idblf[$fm]) . "</option>";
 										} elseif ($month1 != "") {
 											$fm = array_search($month1, $idbls);
-											echo "<option value=" . $month1 . ">" . $idblf[$fm] . "</option>";
+											echo "<option value='" . esc($month1) . "'>" . esc($idblf[$fm]) . "</option>";
 										} else {
-											echo "<option value=" . $idbls[date("n")] . ">" . $idblf[date("n")] . "</option>";
+											echo "<option value='" . esc($idbls[date("n")]) . "'>" . esc($idblf[date("n")]) . "</option>";
 										}
 										for ($x = 1; $x <= 12; $x++) {
-											echo "<option value='" . $idbls[$x] . "''>" . $idblf[$x] . "</option>";
+											echo "<option value='" . esc($idbls[$x]) . "'>" . esc($idblf[$x]) . "</option>";
 										}
 										?>
     		</select>
@@ -295,9 +295,9 @@ $(document).ready(function(){
 										$year1 = substr($idbl, 3, 4);
 
 										if ($year != "") {
-											echo "<option>" . $year . "</option>";
+											echo "<option>" . esc($year) . "</option>";
 										} elseif ($year1 != "") {
-											echo "<option>" . $year1 . "</option>";
+											echo "<option>" . esc($year1) . "</option>";
 										}
 											echo "<option>" . date("Y") . "</option>";
 										
@@ -436,7 +436,7 @@ $(document).ready(function(){
 	<p>
 			<?= $_delete_report ?>
 	</p>
-	<form autocomplete="off" method="post" action="">
+	<form autocomplete="off" method="post" action=""><?= csrf_field() ?>
 	<center>
 	<button type="submit" name="remdata" title="Yes" class="btn bg-primary">Yes</button>&nbsp;
 	<a class="btn bg-secondary" href="#" title="Close" class="modal-close">No</a>

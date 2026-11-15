@@ -30,12 +30,15 @@ if (!isset($_SESSION["mikhmon"])) {
 
 // Check if image file is a actual image or fake image
 
-    $check = getimagesize($_FILES["UploadLogo"]["tmp_name"]);
-    if ($check !== false) {
+    $uperr = isset($_FILES["UploadLogo"]["error"]) ? $_FILES["UploadLogo"]["error"] : UPLOAD_ERR_NO_FILE;
+    $uptmp = isset($_FILES["UploadLogo"]["tmp_name"]) && is_string($_FILES["UploadLogo"]["tmp_name"]) ? $_FILES["UploadLogo"]["tmp_name"] : "";
+    $check = ($uperr === UPLOAD_ERR_OK && $uptmp !== "" && is_uploaded_file($uptmp)) ? getimagesize($uptmp) : false;
+    // must really be a PNG (not just named .png)
+    if ($check !== false && $check[2] === IMAGETYPE_PNG) {
       if ($currency == in_array($currency, $cekindo['indo'])) {
-        $galat = '<div class="box bg-danger"></i> Alert!<br> File name is : ' . basename($_FILES["UploadLogo"]["name"]) . '. </div>';
+        $galat = '<div class="box bg-danger"></i> Alert!<br> File name is : ' . esc(basename((string)$_FILES["UploadLogo"]["name"])) . '. </div>';
       } else {
-        $galat = '<div class="box bg-danger"></i> Alert!<br> File name is : ' . basename($_FILES["UploadLogo"]["name"]) . '. </div>';
+        $galat = '<div class="box bg-danger"></i> Alert!<br> File name is : ' . esc(basename((string)$_FILES["UploadLogo"]["name"])) . '. </div>';
       }
       $uploadOk = 1;
     } else {
@@ -105,7 +108,7 @@ if (!isset($_SESSION["mikhmon"])) {
     <div class="card-body">
       <div>
     <?= $galat; ?>
-      <form action="" method="post" enctype="multipart/form-data">
+      <form action="" method="post" enctype="multipart/form-data"><?= csrf_field() ?>
 
           <div class="pd-10"><?= $_format_file_name ?> : logo-<?= $session; ?>.png </div>
           <div class="input-group">

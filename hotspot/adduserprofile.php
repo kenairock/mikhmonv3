@@ -137,7 +137,7 @@ if (!isset($_SESSION["mikhmon"])) {
     <h3><i class="fa fa-plus"></i> <?= $_add.' '.$_user_profile ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> Processing... </i></small></h3>
   </div>
   <div class="card-body">
-<form autocomplete="off" method="post" action="">
+<form autocomplete="off" method="post" action=""><?= csrf_field() ?>
   <div>
     <a class="btn bg-warning" href="./?hotspot=user-profiles&session=<?= $session; ?>"> <i class="fa fa-close btn-mrg"></i> <?= $_close ?></a>
     <button type="submit" name="save" class="btn bg-primary btn-mrg" ><i class="fa fa-save btn-mrg"></i> <?= $_save ?></button>

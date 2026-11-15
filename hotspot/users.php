@@ -222,34 +222,34 @@ for ($i = 0; $i < $TotalReg; $i++) {
   <?php
   if ($udisabled == "true") {
     $uriprocess = "'./?enable-hotspot-user=" . $uid . "&session=" . $session."'";
-    echo '<span class="text-warning pointer" title="Enable User ' . $uname . '"  onclick="loadpage('.$uriprocess.')"><i class="fa fa-lock "></i></span></td>';
+    echo '<span class="text-warning pointer" title="Enable User ' . esc($uname) . '"  onclick="loadpage('.$uriprocess.')"><i class="fa fa-lock "></i></span></td>';
   } else {
     $uriprocess = "'./?disable-hotspot-user=" . $uid . "&session=" . $session."'";
-    echo '<span class="pointer" title="Disable User ' . $uname . '"  onclick="loadpage('.$uriprocess.')"><i class="fa fa-unlock "></i></span></td>';
+    echo '<span class="pointer" title="Disable User ' . esc($uname) . '"  onclick="loadpage('.$uriprocess.')"><i class="fa fa-unlock "></i></span></td>';
   }
-  echo "<td>" . $userver . "</td>";
+  echo "<td>" . esc($userver) . "</td>";
   if ($uname == $upass) {
     $usermode = "vc";
   } else {
     $usermode = "up";
   }
-  $popup = "javascript:window.open('./voucher/print.php?user=" . $usermode . "-" . $uname . "&qr=no&session=" . $session . "','_blank','width=320,height=550').print();";
-  $popupQR = "javascript:window.open('./voucher/print.php?user=" . $usermode . "-" . $uname . "&qr=yes&session=" . $session . "','_blank','width=320,height=550').print();";
-  echo "<td><a title='Open User " . $uname . "' href=./?hotspot-user=" . $uid . "&session=" . $session . "><i class='fa fa-edit'></i> " . $uname . " </a>";
-  echo '</td><td class"text-center"><a title="Print ' . $uname . '" href="' . $popup . '"><i class="fa fa-print"></i></a> &nbsp <a title="Print ' . $uname . '" href="' . $popupQR . '"><i class="fa fa-qrcode"></i> </a></td>';
-  echo "<td>" . $uprofile . "</td>";
-  echo "<td style=' text-align:left'>" . $umacadd . "</td>";
-  echo "<td style=' text-align:right'>" . $uuptime . "</td>";
-  echo "<td style=' text-align:right'>" . $ubytesi . "</td>";
-  echo "<td style=' text-align:right'>" . $ubyteso . "</td>";
+  $popup = "javascript:window.open('./voucher/print.php?user=" . $usermode . "-" . rawurlencode($uname) . "&qr=no&session=" . $session . "','_blank','width=320,height=550').print();";
+  $popupQR = "javascript:window.open('./voucher/print.php?user=" . $usermode . "-" . rawurlencode($uname) . "&qr=yes&session=" . $session . "','_blank','width=320,height=550').print();";
+  echo "<td><a title='Open User " . esc($uname) . "' href='./?hotspot-user=" . esc(rawurlencode($uid)) . "&session=" . $session . "'><i class='fa fa-edit'></i> " . esc($uname) . " </a>";
+  echo '</td><td class"text-center"><a title="Print ' . esc($uname) . '" href="' . esc($popup) . '"><i class="fa fa-print"></i></a> &nbsp <a title="Print ' . esc($uname) . '" href="' . esc($popupQR) . '"><i class="fa fa-qrcode"></i> </a></td>';
+  echo "<td>" . esc($uprofile) . "</td>";
+  echo "<td style=' text-align:left'>" . esc($umacadd) . "</td>";
+  echo "<td style=' text-align:right'>" . esc($uuptime) . "</td>";
+  echo "<td style=' text-align:right'>" . esc($ubytesi) . "</td>";
+  echo "<td style=' text-align:right'>" . esc($ubyteso) . "</td>";
   echo "<td>";
   if ($uname == "default-trial") {
   } else if (substr($ucomment,0,3) == "vc-" || substr($ucomment,0,3) == "up-") {
-    echo "<a href=./?hotspot=users&comment=" . $ucomment . "&session=" . $session . " title='Filter by " . $ucomment . "'><i class='fa fa-search'></i> ". $ucomment." ". $udatalimit ." ".$utimelimit . "</a>";
+    echo "<a href='./?hotspot=users&comment=" . esc(rawurlencode($ucomment)) . "&session=" . $session . "' title='Filter by " . esc($ucomment) . "'><i class='fa fa-search'></i> ". esc($ucomment." ". $udatalimit ." ".$utimelimit) . "</a>";
   } else if ($utimelimit == ' expired') {
-    echo "<a href=./?hotspot=users&profile=all&exp=1&session=" . $session . " title='Filter by expired'><i class='fa fa-search'></i> " . $ucomment." ". $udatalimit ." ".$utimelimit . "</a>";
+    echo "<a href=./?hotspot=users&profile=all&exp=1&session=" . $session . " title='Filter by expired'><i class='fa fa-search'></i> " . esc($ucomment." ". $udatalimit ." ".$utimelimit) . "</a>";
   }else{
-    echo $ucomment.' ';
+    echo esc($ucomment).' ';
   }
   echo  "</td>";
 

@@ -114,7 +114,7 @@ if (!isset($_SESSION["mikhmon"])) {
         			<?php
 										$day = explode("/", $idhr)[1];
 										if ($day != "") {
-											echo "<option value='" . $day . "'>" . $day . "</option>";
+											echo "<option value='" . esc($day) . "'>" . esc($day) . "</option>";
 										}
 										echo "<option value=''>Day</option>";
 
@@ -124,7 +124,7 @@ if (!isset($_SESSION["mikhmon"])) {
 											} else {
 												$x = $x;
 											}
-											echo "<option value='" . $x . "'>" . $x . "</option>";
+											echo "<option value='" . esc($x) . "'>" . esc($x) . "</option>";
 										}
 										?> 
     		</select>
@@ -139,15 +139,15 @@ if (!isset($_SESSION["mikhmon"])) {
 
 										if ($month != "") {
 											$fm = array_search($month, $idbls);
-											echo "<option value='" . $month . "'>" . $idblf[$fm] . "</option>";
+											echo "<option value='" . esc($month) . "'>" . esc($idblf[$fm]) . "</option>";
 										} elseif ($month1 != "") {
 											$fm = array_search($month1, $idbls);
-											echo "<option value=" . $month1 . ">" . $idblf[$fm] . "</option>";
+											echo "<option value='" . esc($month1) . "'>" . esc($idblf[$fm]) . "</option>";
 										} else {
-											echo "<option value=" . $idbls[date("n")] . ">" . $idblf[date("n")] . "</option>";
+											echo "<option value='" . esc($idbls[date("n")]) . "'>" . esc($idblf[date("n")]) . "</option>";
 										}
 										for ($x = 1; $x <= 12; $x++) {
-											echo "<option value='" . $idbls[$x] . "''>" . $idblf[$x] . "</option>";
+											echo "<option value='" . esc($idbls[$x]) . "'>" . esc($idblf[$x]) . "</option>";
 										}
 										?> 
     		</select>
@@ -159,9 +159,9 @@ if (!isset($_SESSION["mikhmon"])) {
 										$year1 = substr($idbl, 3, 4);
 
 										if ($year != "") {
-											echo "<option>" . $year . "</option>";
+											echo "<option>" . esc($year) . "</option>";
 										} elseif ($year1 != "") {
-											echo "<option>" . $year1 . "</option>";
+											echo "<option>" . esc($year1) . "</option>";
 										} else {
 											echo "<option>" . date("Y") . "</option>";
 										}

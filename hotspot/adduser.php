@@ -88,7 +88,7 @@ if (!isset($_SESSION["mikhmon"])) {
   <h3><i class="fa fa-user-plus"></i> <?= $_add_user ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3> 
   </div>
   <div class="card-body">
-<form autocomplete="off" method="post" action="">  
+<form autocomplete="off" method="post" action=""><?= csrf_field() ?>  
   <div>
   <?php if ($_SESSION['ubp'] != "") {
     echo "    <a class='btn bg-warning' href='./?hotspot=users&profile=" . $_SESSION['ubp'] . "&session=" . $session . "'> <i class='fa fa-close'></i> ".$_close."</a>";

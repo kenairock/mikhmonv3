@@ -15,9 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+include_once('./include/security.php');
+mikhmon_session_cookie_params();
 session_start();
 // hide all error
 error_reporting(0);
+mikhmon_guard_request();
 // check url
 
 ob_start("ob_gzhandler");
@@ -27,7 +30,7 @@ $url = $_SERVER['REQUEST_URI'];
 
 // load session MikroTik
 
-$session = $_GET['session'];
+$session = mikhmon_session_param();
 
 if (!isset($_SESSION["mikhmon"])) {
   header("Location:./admin.php?id=login");
@@ -40,7 +43,7 @@ if (!isset($_SESSION["mikhmon"])) {
   $_SESSION["connect"] = "";
 
 // time zone
-  date_default_timezone_set($_SESSION['timezone']);
+  date_default_timezone_set(!empty($_SESSION['timezone']) ? $_SESSION['timezone'] : date_default_timezone_get());
 
 // lang
   include('./include/lang.php');
@@ -136,6 +139,7 @@ if (!isset($_SESSION["mikhmon"])) {
 
 // logout
   if ($hotspot == "logout") {
+    mikhmon_audit('logout', isset($_SESSION['mikhmon']) ? $_SESSION['mikhmon'] : '');
     echo "<b class='cl-w'><i class='fa fa-circle-o-notch fa-spin' style='font-size:24px'></i> Logout...</b>";
 
     session_destroy();

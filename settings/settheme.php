@@ -44,25 +44,21 @@ $themenum = array_search($gettheme, $mtheme);
 
 $getthemecolor = $theme_color[$themenum];
 
-if (empty($gettheme)) {  
+if (empty($gettheme) || !isset($_SESSION["mikhmon"])) {  
 
 } else {
     if (in_array($gettheme, $mtheme)) {
         include_once('./include/headhtml.php');
-        $gen = '<?php $theme="' . $gettheme . '"; $themecolor="'.$getthemecolor.'";?>';
-        $stheme = './include/theme.php';
-        $handle = fopen($stheme, 'w') or die('Cannot open file:  ' . $stheme);
-        $data = $gen;
-        fwrite($handle, $data);
+        mikhmon_write_php_var('./include/theme.php', array('theme' => $gettheme, 'themecolor' => $getthemecolor));
         $_SESSION['theme'] = $gettheme;
         $_SESSION['themecolor'] = $getthemecolor;
-        echo '<center><div style="padding-top:10%;"><i class="fa fa-circle-o-notch fa-spin" style="font-size:40px"></i></div><h3>Load '.$gettheme.' theme...</h3></center>';
-        echo "<script>window.location='" . $url2 . "'</script>";
+        echo '<center><div style="padding-top:10%;"><i class="fa fa-circle-o-notch fa-spin" style="font-size:40px"></i></div><h3>Load '.esc($gettheme).' theme...</h3></center>';
+        echo "<script>window.location=" . esc_js($url2) . "</script>";
         
     } else {
         include_once('./include/headhtml.php');
-        echo '<center><div style="padding-top:10%;"><i class="fa fa-circle-o-notch fa-spin" style="font-size:40px"></i></div><h3>'.$gettheme.' theme not found...</h3></center>';
-        echo "<script>window.location='" . $url2 . "'</script>";
+        echo '<center><div style="padding-top:10%;"><i class="fa fa-circle-o-notch fa-spin" style="font-size:40px"></i></div><h3>'.esc($gettheme).' theme not found...</h3></center>';
+        echo "<script>window.location=" . esc_js($url2) . "</script>";
     }
 }
 

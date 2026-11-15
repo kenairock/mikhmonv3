@@ -160,7 +160,7 @@ $getquickprint = $API->comm("/system/script/print", array("?.id" => "$qpid"));
 	<h3><i class="fa fa-ticket"></i> <?php if(isset($qpid)){echo $_edit;}else{echo $_add;} echo ' '. $_quick_print ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3> 
 	</div>
 	<div class="card-body">
-<form autocomplete="off" method="post" action="">
+<form autocomplete="off" method="post" action=""><?= csrf_field() ?>
 	<div>
 <?php if(isset($qpid)){echo "
 		<a class='btn bg-warning' href='./?hotspot=list-quick-print&session=".$session."'> <i class='fa fa-close'></i> ".$_cancel."</a>";
