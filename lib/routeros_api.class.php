@@ -205,12 +205,16 @@ class RouterosAPI
                         $CURRENT =& $PARSED[$x][];
                     }
                 } elseif ($x != '!done' && $x != '!empty') {
-                    $MATCHES = array();
-                    if (preg_match_all('/[^=]+/i', $x, $MATCHES)) {
-                        if ($MATCHES[0][0] == 'ret') {
-                            $singlevalue = $MATCHES[0][1];
+                    // "=name=value": split at the first "=" after the name only, so values that contain
+                    // "=" themselves (scripts, comments like "a=b") are kept whole instead of being cut
+                    $word = (strlen($x) > 0 && $x[0] === '=') ? substr($x, 1) : $x;
+                    $kv = explode('=', $word, 2);
+                    if ($kv[0] !== '') {
+                        $val = isset($kv[1]) ? $kv[1] : '';
+                        if ($kv[0] == 'ret') {
+                            $singlevalue = $val;
                         }
-                        $CURRENT[$MATCHES[0][0]] = (isset($MATCHES[0][1]) ? $MATCHES[0][1] : '');
+                        $CURRENT[$kv[0]] = $val;
                     }
                 }
             }
@@ -247,12 +251,16 @@ class RouterosAPI
                         $CURRENT =& $PARSED[$x][];
                     }
                 } elseif ($x != '!done' && $x != '!empty') {
-                    $MATCHES = array();
-                    if (preg_match_all('/[^=]+/i', $x, $MATCHES)) {
-                        if ($MATCHES[0][0] == 'ret') {
-                            $singlevalue = $MATCHES[0][1];
+                    // "=name=value": split at the first "=" after the name only, so values that contain
+                    // "=" themselves (scripts, comments like "a=b") are kept whole instead of being cut
+                    $word = (strlen($x) > 0 && $x[0] === '=') ? substr($x, 1) : $x;
+                    $kv = explode('=', $word, 2);
+                    if ($kv[0] !== '') {
+                        $val = isset($kv[1]) ? $kv[1] : '';
+                        if ($kv[0] == 'ret') {
+                            $singlevalue = $val;
                         }
-                        $CURRENT[$MATCHES[0][0]] = (isset($MATCHES[0][1]) ? $MATCHES[0][1] : '');
+                        $CURRENT[$kv[0]] = $val;
                     }
                 }
             }
