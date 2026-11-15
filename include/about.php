@@ -23,22 +23,6 @@ if (!isset($_SESSION["mikhmon"])) {
 } else {
 }
 ?>
-<style>
-.iFWrapper {
-	position: relative;
-	padding-bottom: 56.25%; /* 16:9 */
-	padding-top: 25px;
-	height: 0;
-}
-.iFWrapper iframe {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-  height: 100%;
-  border :none;
-}
-</style>
 <div class="row">
   <div class="col-12">
     <div class="card">
@@ -85,9 +69,12 @@ if (!isset($_SESSION["mikhmon"])) {
   <h3><i class="fa fa-info-circle"></i> Changelog</h3>
   </div>
   <div class="card-body">
-  <div class="iFWrapper">
-    <iframe src="https://laksa19.github.io/mikhmonv3" ></iframe>
-  </div>
+  <!-- Not embedded on purpose: an iframe made every visit to this page contact an outside site
+       (and hang when the server has no internet). It is now only opened when you click. -->
+  <p>The upstream project's changelog is on the web:
+    <a href="https://laksa19.github.io/mikhmonv3" target="_blank" rel="noopener noreferrer">laksa19.github.io/mikhmonv3</a>
+  </p>
+  <p>Changes made in this fork are listed in its git history.</p>
   </div>
 </div>
 </div>
