@@ -315,6 +315,11 @@ elseif ($removeexpiredhotspotuser != "") {
     include_once('./process/disablehotspotuser.php');
   }
 
+// blocked content (per-profile firewall rules)
+  elseif ($hotspot == "blocking") {
+    include_once('./hotspot/blocking.php');
+  }
+
 // user profile
   elseif ($hotspot == "user-profiles") {
     include_once('./hotspot/userprofile.php');

@@ -494,6 +494,9 @@ function mikhmon_required_role()
     if ($script === 'index.php' && in_array($get('hotspot'), array('template-editor', 'uplogo'), true)) {
         return 'admin';
     }
+    if ($script === 'index.php' && $get('hotspot') === 'blocking' && mikhmon_is_post()) {
+        return 'admin'; // custom block list is router-wide
+    }
     $need = 'viewer';
     foreach (mikhmon_action_keys() as $key => $role) {
         if ($get($key) !== '' && mikhmon_role_level($role) > mikhmon_role_level($need)) {
@@ -919,3 +922,4 @@ function mikhmon_rate_clear($bucket)
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/totp.php';
 require_once __DIR__ . '/devicelimit.php';
+require_once __DIR__ . '/blockcontent.php';

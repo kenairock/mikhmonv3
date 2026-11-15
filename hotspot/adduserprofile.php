@@ -99,6 +99,11 @@ if (!isset($_SESSION["mikhmon"])) {
       "on-login" => "$onlogin",
       "parent-queue" => "$parent",
     ));
+    // blocked content (firewall rules for this profile's users)
+    $blockwarn = mikhmon_block_apply_profile($API, $name, mikhmon_block_posted(), '');
+    if ($blockwarn !== '') {
+      echo "<script>alert(" . esc_js($blockwarn) . ")</script>";
+    }
 
     if($expmode != "0"){
       if (empty($monid)){
@@ -174,6 +179,7 @@ if (!isset($_SESSION["mikhmon"])) {
       </select>
     </td>
   </tr>
+<?= mikhmon_block_form_row(array()) ?>
   <tr>
     <td class="align-middle">Rate limit [up/down]</td><td><input class="form-control" type="text" name="ratelimit" autocomplete="off" value="" placeholder="Example : 512k/1M" ></td>
   </tr>

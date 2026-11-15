@@ -96,7 +96,12 @@ for ($i = 0; $i < $TotalReg; $i++) {
   <td style='text-align:center;'><i class='fa fa-minus-square text-danger pointer' onclick="if(confirm('Are you sure to delete profile (<?= $pname; ?>)?')){loadpage('./?remove-user-profile=<?= $pid; ?>&pname=<?= $pname ?>&session=<?= $session; ?>')}else{}" title='Remove <?= $pname; ?>'></i>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
   <?php
 	echo "<a title='Open User by profile " . $pname . "'  href='./?hotspot=users&profile=" . $pname . "&session=" . $session . "'><i class='fa fa-users'></i></a></td>";
-	echo "<td><a title='Open User Profile " . $pname . "' href='./?user-profile=" . $pid . "&session=" . $session . "'><i class='fa fa-edit'></i> <i class='fa fa-ci fa-circle ".$moncolor."'></i> $pname</a></td>";
+	echo "<td><a title='Open User Profile " . $pname . "' href='./?user-profile=" . $pid . "&session=" . $session . "'><i class='fa fa-edit'></i> <i class='fa fa-ci fa-circle ".$moncolor."'></i> $pname</a>";
+	if (!isset($pblockmap)) { $pblockmap = mikhmon_block_profiles($API); $pblockcat = mikhmon_block_catalog(); }
+	foreach ((isset($pblockmap[$pname]) ? $pblockmap[$pname] : array()) as $bc) {
+		echo " <i class='fa fa-ban text-red' title='Blocks " . esc(isset($pblockcat[$bc]) ? $pblockcat[$bc]['label'] : $bc) . "'></i>";
+	}
+	echo "</td>";
 //$profiledetalis = $ARRAY[$i];echo "<td>" . $profiledetalis['name'];echo "</td>";
 	$pdevices = mikhmon_profile_devices($psharedu, $ponlogin);
 	echo "<td>" . esc($pdevices['limit']) . ($pdevices['kick'] ? " <i class='fa fa-random text-orange' title='Disconnects the oldest device when a new one logs in'></i>" : '');

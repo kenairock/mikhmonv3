@@ -29,6 +29,7 @@ $getmonid = $API->comm("/system/scheduler/print", array(
 ));
 $monid = $getmonid[0]['.id'];
 
+mikhmon_block_forget_profile($API, (string) $pname);
 $API->comm("/ip/hotspot/user/profile/remove", array(
     ".id" => "$pid",
 ));

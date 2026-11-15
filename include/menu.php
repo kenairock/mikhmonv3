@@ -51,6 +51,11 @@ if (!isset($_SESSION["mikhmon"])) {
     $susers = "active";
     $mpage = $_users;
     $umenu = "menu-open";
+  } elseif ($hotspot == "blocking") {
+    $sblocking = "active";
+    $suserprof = "active";
+    $mpage = "Blocked content";
+    $upmenu = "menu-open";
   } elseif ($hotspot == "user-profiles") {
     $suserprofiles = "active";
     $suserprof = "active";
@@ -240,6 +245,7 @@ include('./info.php');
   <div class="dropdown-container <?= $upmenu; ?>">
     <a href="./?hotspot=user-profiles&session=<?= $session; ?>" class=" <?= $suserprofiles; ?>"> <i class="fa fa-list"></i> <?= $_user_profile_list ?> </a>
     <?php if (mikhmon_can('operator')) { ?> <a href="./?user-profile=add&session=<?= $session; ?>" class=" <?= $sadduserprof; ?>"> <i class="fa fa-plus-square"></i> <?= $_add_user_profile ?> </a> <?php } ?>
+    <a href="./?hotspot=blocking&session=<?= $session; ?>" class=" <?= isset($sblocking) ? $sblocking : ''; ?>"> <i class="fa fa-ban"></i> Blocked content </a>
 
   </div>
   <!--active-->

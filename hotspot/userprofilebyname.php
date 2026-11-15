@@ -47,6 +47,8 @@ if (!isset($_SESSION["mikhmon"])) {
   $pdevices = mikhmon_profile_devices($psharedu, $profiledetalis['on-login']);
   $psharedu = $pdevices['limit'];
   $pkick = $pdevices['kick'];
+  $pblockmap = mikhmon_block_profiles($API);
+  $pblocked = isset($pblockmap[$pname]) ? $pblockmap[$pname] : array();
   $pratelimit = $profiledetalis['rate-limit'];
   $ponlogin = $profiledetalis['on-login'];
   $ppool = $profiledetalis['address-pool'];
@@ -181,6 +183,11 @@ if (!isset($_SESSION["mikhmon"])) {
       "on-login" => "$onlogin",
       "parent-queue" => "$parent",
     ));
+    // blocked content (firewall rules for this profile's users)
+    $blockwarn = mikhmon_block_apply_profile($API, $name, mikhmon_block_posted(), $pname);
+    if ($blockwarn !== '') {
+      echo "<script>alert(" . esc_js($blockwarn) . ")</script>";
+    }
     if($expmode != "0"){
     if (empty($monid)){
       $API->comm("/system/scheduler/add", array(
@@ -252,6 +259,7 @@ if (!isset($_SESSION["mikhmon"])) {
       </select>
     </td>
   </tr>
+<?= mikhmon_block_form_row($pblocked) ?>
   <tr>
     <td>Rate limit [up/down]</td><td><input class="form-control" type="text" name="ratelimit" autocomplete="off" value="<?= $pratelimit; ?>" placeholder="Example : 512k/1M" ></td>
   </tr>
